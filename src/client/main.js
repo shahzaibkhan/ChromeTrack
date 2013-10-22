@@ -53,22 +53,6 @@ var compressString = function (uncompressedString) {
     return compressedB64;
 };
 
-var audioRecorder = {
-    stream: null,
-    src: null,
-    init:   function () {
-                navigator.webkitGetUserMedia(
-                    {audio: true},
-                    function (stream) {
-                        audioRecorder.stream = stream;
-                        audioRecorder.src = webkitURL.createObjectURL(stream);
-                    },
-                    function (error) {
-                        console.error(error);
-                    });
-            }
-}
-
 ///////////////////////////////////////////////////////////////////////////////
 // Define listener callback functions.
 ///////////////////////////////////////////////////////////////////////////////
