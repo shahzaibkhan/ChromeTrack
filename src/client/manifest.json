@@ -8,7 +8,9 @@
     "persistent": true,
     "scripts": [
       "lib/FileSaver.js",
-      "background.js"
+      "lib/base64-string-v1.1.0.js",
+      "lib/lz-string-1.3.3.js",
+      "main.js"
     ]
   },
 
