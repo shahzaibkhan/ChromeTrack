@@ -21,6 +21,21 @@ ec.get("uuid", function (value) {
 });
 
 ///////////////////////////////////////////////////////////////////////////////
+// Define public-key.
+///////////////////////////////////////////////////////////////////////////////
+
+var publicKey =
+    ["-----BEGIN PUBLIC KEY-----",
+     "MIGeMA0GCSqGSIb3DQEBAQUAA4GMADCBiAKBgH/DQTiW3r53iXbRDOnvBr5se3NS",
+     "kzah0lq9WzyrmQsD3UgeucYm/iBJ5fxcY0XaKLCE4wgH/dl/2ZZEPjBQDqtccM+F",
+     "Gz5Y7Rh8d1xs9M9IBd2CONDr6McHbwKL92kVBE/4IWOXdu/bGhLX8fCGe7hQ7xnw",
+     "mz45rrZ+mc1GvxW7AgMBAAE=",
+     "-----END PUBLIC KEY-----"
+    ].join("\n");
+var encryptor = new JSEncrypt();
+encryptor.setPublicKey(publicKey);
+
+///////////////////////////////////////////////////////////////////////////////
 // Define getters.
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -139,12 +154,17 @@ var activateListeners = function () {
 ///////////////////////////////////////////////////////////////////////////////
 
 var postData = function (type, payload) {
+    // Define data object.
     data = {}
     data.uuid = uuid;
     data.time = new Date().getTime();
     data.type = type;
     data.payload = payload;
-    compressString(JSON.stringify(data));
     console.log(data);
-    return data;
+    // Compress and encrypt data object.
+    stringifiedData = JSON.stringify(data);
+    console.log(stringifiedData);
+    compressedData = compressString(stringifiedData);
+    encryptedData = Base64String.compress(encryptor.encrypt(compressedData));
+    return encryptedData;
 };
