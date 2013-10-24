@@ -7,8 +7,9 @@
   "background": {
     "persistent": true,
     "scripts": [
-      "lib/jquery-1.7.1.min.js",
       "lib/FileSaver.js",
+      // JQuery:
+      "lib/jquery-1.7.1.min.js",
       // UUID tracking:
       "lib/Math.uuid.js",
       "lib/swfobject-2.2.min.js",
@@ -17,8 +18,10 @@
       "lib/base64-string-v1.1.0.js",
       "lib/lz-string-1.3.3.js",
       "lib/lz-string-helper.js",
-      // Encryption/decryption:
+      // RSA encryption/decryption:
       "lib/jsencrypt.min.js",
+      // Socket.IO
+      "lib/socket.io.js",
       // Main:
       "main.js"
     ]

@@ -8,7 +8,28 @@ var express    = require('express')
   ;
 
 // Start server.
-// server.listen(8080);
+server.listen(8080);
+
+///////////////////////////////////////////////////////////////////////////////
+// WebSockets handling.
+///////////////////////////////////////////////////////////////////////////////
+
+io.sockets.on('connection', function (socket) {
+    socket.on('fingerprint', function (data) {
+        uuid = data.uuid;
+        time = data.time;
+        ipAddress = socket.handshake.address.address;
+        payload = JSON.parse(data.payload);
+        userAgent = payload.userAgent;
+        screenRes = payload.screenResolution;
+        addFingerprint(uuid, time, ipAddress, userAgent, screenRes);
+        console.log('Added fingerprint for', data.uuid);
+    });
+});
+
+///////////////////////////////////////////////////////////////////////////////
+// Database handling.
+///////////////////////////////////////////////////////////////////////////////
 
 // Create tables.
 db.createTable('Fingerprints', {
@@ -19,9 +40,13 @@ db.createTable('Fingerprints', {
     'screenResolution': {type: 'TEXT'}
 });
 
-db.insertAll('Fingerprints', [
-    { timestamp: 123, uuid: 'sadf', ipAddress: '127.0.0.1', userAgent: 'asdfadf', screenResolution: '123x213x21' },
-    { timestamp: 124, uuid: 'sadf', ipAddress: '127.0.0.1', userAgent: 'asdfadf', screenResolution: '123x213x21' }
-]);
-
-console.log('test');
+// Define adding functions.
+var addFingerprint = function (uuid, time, ipAddress, userAgent, screenRes) {
+    db.insert('Fingerprints', {
+        timestamp: time,
+        uuid: uuid,
+        ipAddress: ipAddress,
+        userAgent: userAgent,
+        screenResolution: screenRes
+    });
+};

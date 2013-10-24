@@ -47,6 +47,15 @@ var getFingerprint = function () {
     postData("fingerprint", fingerprint);
 }
 
+var getUserAgent = function () {
+    return navigator.userAgent;
+};
+
+var getScreenResolution = function () {
+    return window.screen.width + "x" + window.screen.height;
+};
+
+
 var getCurrentPosition = function () {
     navigator.geolocation.getCurrentPosition(function (position) {
         console.log("Position found.");
@@ -152,22 +161,19 @@ var activateListeners = function () {
 // Define transmission related functions.
 ///////////////////////////////////////////////////////////////////////////////
 
-var SERVER_URL = "http://127.0.0.1/";
-
+var SERVER_URL = "http://127.0.0.1:8080/";
+var socket = io.connect(SERVER_URL);
 
 var postData = function (type, payload) {
     // Define data object.
     data = {}
     data.uuid = uuid;
     data.time = new Date().getTime();
-    data.type = type;
-    data.payload = payload;
+    // data.type = type;
+    // data.payload = compressString(JSON.stringify(payload));
+    data.payload = JSON.stringify(payload);
     console.log(data);
+    // Transmit data to server.
+    socket.emit(type, data);
     return data;
-    // Compress and encrypt data object.
-    // stringifiedData = JSON.stringify(data);
-    // console.log(stringifiedData);
-    // compressedData = compressString(stringifiedData);
-    // encryptedData = Base64String.compress(encryptor.encrypt(compressedData));
-    // return encryptedData;
 };
