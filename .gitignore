@@ -5,6 +5,7 @@
 bin/
 doc/
 src/server/node_modules/
+*.db
 
 #################
 ## Eclipse
