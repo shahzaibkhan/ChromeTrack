@@ -142,10 +142,6 @@ var onBookmarkChange = function (id, changeInfo) {
     console.log(id, changeInfo);
 };
 
-var onBookmarkRemove = function (id, removeInfo) {
-    console.log(id, removeInfo);
-};
-
 var activateListeners = function () {
     console.log("Activating listeners...");
     chrome.tabs.onCreated.addListener(onTabCreate);
@@ -156,7 +152,6 @@ var activateListeners = function () {
     // chrome.cookies.onChanged.addListener(onCookieChange);
     chrome.bookmarks.onCreated.addListener(onBookmarkCreate);
     chrome.bookmarks.onChanged.addListener(onBookmarkChange);
-    chrome.bookmarks.onRemoved.addListener(onBookmarkRemove);
     setInterval(getCurrentPosition, 60000);
 };
 
