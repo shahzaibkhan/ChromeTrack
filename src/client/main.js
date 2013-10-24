@@ -40,19 +40,12 @@ encryptor.setPublicKey(publicKey);
 ///////////////////////////////////////////////////////////////////////////////
 
 var getFingerprint = function () {
-    fingerprint = {};
-    fingerprint.userAgent = getUserAgent();
-    fingerprint.screenResolution = getScreenResolution();
+    fingerprint = {
+        userAgent: getUserAgent(),
+        screenResolution: getScreenResolution()
+    };
     postData("fingerprint", fingerprint);
 }
-
-var getUserAgent = function () {
-    return navigator.userAgent;
-};
-
-var getScreenResolution = function () {
-    return window.screen.width + "x" + window.screen.height;
-};
 
 var getCurrentPosition = function () {
     navigator.geolocation.getCurrentPosition(function (position) {
