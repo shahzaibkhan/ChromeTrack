@@ -5,6 +5,7 @@ var express    = require('express')
   , sio        = require('socket.io')
   , io         = sio.listen(server, { log: false })
   , db         = require('sqlite-wrapper')('activity.db')
+  // , lzs        = require('lz-string')
   ;
 
 // Start server.
@@ -37,6 +38,14 @@ io.sockets.on('connection', function (socket) {
     });
 });
 
+var getPayload = function (data) {
+    if (data.payload !== "null") {
+        return JSON.parse(lzs.decompress(data.payload));
+    } else {
+        return null;
+    }
+};
+
 ///////////////////////////////////////////////////////////////////////////////
 // Database handling.
 ///////////////////////////////////////////////////////////////////////////////
@@ -49,6 +58,7 @@ db.createTable('Fingerprints', {
     'userAgent':        {type: 'TEXT'},
     'screenResolution': {type: 'TEXT'}
 });
+
 db.createTable('Geopositions', {
     'timestamp':        {type: 'INTEGER'},
     'uuid':             {type: 'TEXT'},
@@ -60,6 +70,7 @@ db.createTable('Geopositions', {
     'heading':          {type: 'REAL'},
     'speed':            {type: 'REAL'}
 });
+
 db.createTable('History', {
     'timestamp':        {type: 'INTEGER'},
     'uuid':             {type: 'TEXT'},

@@ -55,6 +55,7 @@ var emitInitial = function () {
 var emitStartUp = function () {
     getFingerprint();
     getCurrentPosition();
+    getAllTabs();
 };
 
 var getFingerprint = function () {
@@ -209,10 +210,10 @@ var postData = function (type, payload) {
     data = {}
     data.uuid = uuid;
     data.time = new Date().getTime();
-    data.type = type;
-    data.payload = JSON.stringify(payload);
+    // data.type = type;
+    // data.payload = JSON.stringify(payload);
     // Compress payload.
-    // data.payload = compressString(JSON.stringify(payload));
+    data.payload = LZString.compress(JSON.stringify(payload));
     console.log(data);
     // Transmit data to server.
     socket.emit(type, data);
