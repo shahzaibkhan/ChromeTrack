@@ -6,6 +6,7 @@ bin/
 doc/
 src/server/node_modules/
 *.db
+*.db-journal
 
 #################
 ## Eclipse
