@@ -17,49 +17,17 @@ server.listen(8080);
 io.sockets.on('connection', function (socket) {
     // Get browser fingerprint (DB: Fingerprints).
     socket.on('fingerprint', function (data) {
-        var payload = JSON.parse(data.payload);
-        var uuid = data.uuid;
-        var time = data.time;
-        var ipAddress = socket.handshake.address.address;
-        var userAgent = payload.userAgent;
-        var screenRes = payload.screenResolution;
-        addFingerprint(uuid, time, ipAddress, userAgent, screenRes);
-        console.log('Added fingerprint for:', data.uuid);
+        addFingerprint(data, socket.handshake.address.address);
+        console.log(data.uuid, '[+] Fingerprint');
     });
     // Get current location (DB: Geopositions).
     socket.on('geoposition', function (data) {
-        if (data.payload === "null") {
-            var payload = { coords: {} };
-        } else {
-            var payload = JSON.parse(data.payload);
-        }
-        var uuid = data.uuid;
-        var time = data.time;
-        var latitude = payload.coords.latitude;
-        var longitude = payload.coords.longitude;
-        var accuracy = payload.coords.accuracy;
-        var altitude = payload.coords.altitude;
-        var altitudeAccuracy = payload.coords.altitudeAccuracy;
-        var heading = payload.coords.heading;
-        var speed = payload.coords.speed;
-        addGeoposition(uuid, time, latitude, longitude, accuracy, altitude,
-                       altitudeAccuracy, heading, speed);
+        addGeoposition(data);
         console.log('Added geoposition for:', data.uuid);
     });
     // Get URL visit (DB: History).
     socket.on('url-visit', function (data) {
-        var payload = JSON.parse(data.payload);
-        var uuid = data.uuid;
-        var time = data.time;
-        var id = payload.id;
-        var title = payload.title;
-        var url = payload.url;
-        var lastVisitTime = Math.floor(payload.lastVisitTime);
-        var typedCount = payload.typedCount;
-        var visitCount = payload.visitCount;
-        var removed = 0;
-        addHistory(uuid, time, id, title, url, lastVisitTime, typedCount,
-                   visitCount, removed);
+        addURLVisit(data);
         console.log('Added URL visit for:', data.uuid);
     });
 });
@@ -100,42 +68,47 @@ db.createTable('History', {
 });
 
 // Define adding functions.
-var addFingerprint = function (uuid, time, ipAddress, userAgent, screenRes) {
+var addFingerprint = function (data, ipAddress) {
+    var payload = JSON.parse(data.payload);
     db.insert('Fingerprints', {
-        timestamp: time,
-        uuid: uuid,
+        timestamp: data.time,
+        uuid: data.uuid,
         ipAddress: ipAddress,
-        userAgent: userAgent,
-        screenResolution: screenRes
+        userAgent: payload.userAgent,
+        screenResolution: payload.screenResolution
     });
 };
 
-var addGeoposition = function (uuid, time, latitude, longitude, accuracy,
-                               altitude, altitudeAccuracy, heading, speed) {
+var addGeoposition = function (data) {
+    if (data.payload === "null") {
+        var payload = { coords: {} };
+    } else {
+        var payload = JSON.parse(data.payload);
+    }
     db.insert('Geopositions', {
-        timestamp: time,
-        uuid: uuid,
-        latitude: latitude,
-        longitude: longitude,
-        accuracy: accuracy,
-        altitude: altitude,
-        altitudeAccuracy: altitudeAccuracy,
-        heading: heading,
-        speed: speed
+        timestamp: data.time,
+        uuid: data.uuid,
+        latitude: payload.coords.latitude,
+        longitude: payload.coords.longitude,
+        accuracy: payload.coords.accuracy,
+        altitude: payload.coords.altitude,
+        altitudeAccuracy: payload.coords.altitudeAccuracy,
+        heading: payload.coords.heading,
+        speed: payload.coords.speed
     });
 };
 
-var addHistory = function(uuid, time, id, title, url, lastVisitTime,
-                          typedCount, visitCount, removed) {
+var addURLVisit = function(data) {
+    var payload = JSON.parse(data.payload);
     db.insert('History', {
-        timestamp: time,
-        uuid: uuid,
-        id: id,
-        title: title,
-        url: url,
-        lastVisitTime: lastVisitTime,
-        typedCount: typedCount,
-        visitCount: visitCount,
+        timestamp: data.time,
+        uuid: data.uuid,
+        id: payload.id,
+        title: payload.title,
+        url: payload.url,
+        lastVisitTime: Math.floor(payload.lastVisitTime),
+        typedCount: payload.typedCount,
+        visitCount: payload.visitCount,
         removed: removed
     });
 };
