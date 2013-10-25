@@ -31,7 +31,7 @@ io.sockets.on('connection', function (socket) {
         console.log(data.uuid, '[+] URL Visit');
     });
     // Get URL removal (DB: History).
-    socket.on('url-removal', function (data) {
+    socket.on('url-removed', function (data) {
         addURLRemoval(data);
         console.log(data.uuid, '[+] URL Removal');
     });

