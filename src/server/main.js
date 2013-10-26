@@ -1,4 +1,4 @@
-// Import modules.
+// Import library modules.
 var express    = require('express')
   , app        = express()
   , server     = require('http').createServer(app)
@@ -8,6 +8,11 @@ var express    = require('express')
   // , crypto     = require('cryptojs').Crypto
   // , lzs        = require('lz-string')
   ;
+
+// Import event modules.
+var events = {
+    fingerprint: require('./events/fingerprint.js')(db)
+};
 
 // Start server.
 server.listen(8080);
@@ -19,8 +24,8 @@ server.listen(8080);
 io.sockets.on('connection', function (socket) {
     // Get browser fingerprint (DB: Fingerprints).
     socket.on('addFingerprint', function (data) {
-        addFingerprint(data, socket.handshake.address.address);
-        console.log(data.uuid, '[+] Fingerprint');
+        var ipAddress = socket.handshake.address.address;
+        events.fingerprint.add(data, ipAddress);
     });
     // Get current location (DB: Geopositions).
     socket.on('addGeoposition', function (data) {
@@ -61,24 +66,10 @@ var getPayload = function (data) {
 // Database handling.
 ///////////////////////////////////////////////////////////////////////////////
 
-db.createTable('Fingerprints', {
-    'timestamp':        {type: 'INTEGER'},
-    'uuid':             {type: 'TEXT'},
-    'ipAddress':        {type: 'TEXT'},
-    'userAgent':        {type: 'TEXT'},
-    'screenResolution': {type: 'TEXT'}
-});
-
-var addFingerprint = function (data, ipAddress) {
-    var payload = JSON.parse(data.payload);
-    db.insert('Fingerprints', {
-        timestamp: data.time,
-        uuid: data.uuid,
-        ipAddress: ipAddress,
-        userAgent: payload.userAgent,
-        screenResolution: payload.screenResolution
-    });
-};
+// Create tables.
+for (var event in events) {
+    events[event].createTable();
+}
 
 db.createTable('Geopositions', {
     'timestamp':        {type: 'INTEGER'},
