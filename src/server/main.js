@@ -4,7 +4,7 @@ var express    = require('express')
   , server     = require('http').createServer(app)
   , sio        = require('socket.io')
   , io         = sio.listen(server, { log: false })
-  , db         = require('sqlite-wrapper')('activitus.db')
+  , db         = require('sqlite-wrapper')('activity.sqlite')
   // , crypto     = require('cryptojs').Crypto
   // , lzs        = require('lz-string')
   ;
