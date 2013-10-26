@@ -16,7 +16,9 @@ module.exports = function(db) {
             db.createTable(this.tableName, this.tableStructure);
         },
         add: function (data, ipAddress) {
+            // Parse payload JSON.
             var payload = JSON.parse(data.payload);
+            // Insert payload data into DB.
             db.insert(this.tableName, {
                 timestamp: data.time,
                 uuid: data.uuid,
