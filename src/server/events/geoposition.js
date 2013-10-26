@@ -3,7 +3,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 module.exports = function(db) {
-    return {
+    return exports = {
         tableName: "Geopositions",
         tableStructure: {
             'timestamp':        {type: 'INTEGER'},

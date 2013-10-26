@@ -95,7 +95,7 @@ var getAllBookmarks = function () {
 
 var getAllHistory = function () {
     chrome.history.search({"text": ""}, function (historyArray) {
-        postData("history-all", historyArray);
+        postData("addURL", historyArray);
     });
 };
 
@@ -162,7 +162,7 @@ var onTabRemoved = function (tabId, removeInfo) {
 var onURLVisit = function (result) {
     console.log("URL visit:", result.title, "(" + result.url + ") at",
                 result.lastVisitTime + ",", result.visitCount, "times");
-    postData('addURLVisit', result);
+    postData('addURL', result);
 };
 
 var onURLRemoved = function (removed) {
@@ -173,7 +173,6 @@ var onURLRemoved = function (removed) {
 };
 
 var onCookieChange = function (changeInfo) {
-    console.log(changeInfo);
     postData('addCookieChange', changeInfo);
 };
 
@@ -219,7 +218,7 @@ var postData = function (type, payload) {
     // Compress payload.
     // data.payload = LZString.compress(JSON.stringify(payload));
     console.log(data);
-    console.log(payload);
+    // console.log(payload);
     // Transmit data to server.
     socket.emit(type, data);
     return data;
