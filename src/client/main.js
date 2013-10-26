@@ -101,7 +101,7 @@ var getAllHistory = function () {
 
 var getAllTabs = function () {
     chrome.windows.getAll({"populate": true}, function (windowArray) {
-        postData("tabs-all", windowArray);
+        postData('addAllTabs', windowArray);
     });
 }
 
@@ -126,16 +126,15 @@ var getAllCookies = function () {
 ///////////////////////////////////////////////////////////////////////////////
 
 var onWindowCreate = function (newWindow) {
-    console.log(newWindow);
-    postData('window-create', newWindow);
+    postData('addWindow', newWindow);
 };
 
 var onWindowActive = function (windowId) {
-    postData('window-active', {'windowId': windowId});
+    postData('focusWindow', {'windowId': windowId});
 }
 
 var onWindowRemoved = function (windowId) {
-    postData('window-removed', {'windowId': windowId});
+    postData('removeWindow', {'windowId': windowId});
 }
 
 var onTabCreate = function (tab) {

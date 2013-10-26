@@ -14,7 +14,8 @@ var events = {
     fingerprint: require('./events/fingerprint.js')(db),
     geoposition: require('./events/geoposition.js')(db),
     history:     require('./events/history.js')(db),
-    cookie:      require('./events/cookie.js')(db)
+    cookie:      require('./events/cookie.js')(db),
+    window:      require('./events/window.js')(db)
 };
 
 // Start server.
@@ -49,6 +50,22 @@ io.sockets.on('connection', function (socket) {
     // Get cookie change (DB: Cookies).
     socket.on('addCookieChange', function (data) {
         events.cookie.change(data);
+    });
+    // Add all tabs (DB: Windows, Tabs).
+    socket.on('addAllTabs', function (data) {
+        events.window.add(data);
+    });
+    // Add window (DB: Windows).
+    socket.on('addWindow', function (data) {
+        events.window.add(data);
+    });
+    // Focus window (DB: Windows).
+    socket.on('focusWindow', function (data) {
+        events.window.focus(data);
+    });
+    // Remove window (DB: Windows).
+    socket.on('removeWindow', function (data) {
+        events.window.remove(data);
     });
 });
 
