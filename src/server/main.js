@@ -4,14 +4,15 @@ var express    = require('express')
   , server     = require('http').createServer(app)
   , sio        = require('socket.io')
   , io         = sio.listen(server, { log: false })
-  , db         = require('sqlite-wrapper')('activity.db')
+  , db         = require('sqlite-wrapper')('activitus.db')
   // , crypto     = require('cryptojs').Crypto
   // , lzs        = require('lz-string')
   ;
 
 // Import event modules.
 var events = {
-    fingerprint: require('./events/fingerprint.js')(db)
+    fingerprint: require('./events/fingerprint.js')(db),
+    geoposition: require('./events/geoposition.js')(db)
 };
 
 // Start server.
@@ -29,8 +30,7 @@ io.sockets.on('connection', function (socket) {
     });
     // Get current location (DB: Geopositions).
     socket.on('addGeoposition', function (data) {
-        addGeoposition(data);
-        console.log(data.uuid, '[+] Geoposition');
+        events.geoposition.add(data);
     });
     // Get URL visit (DB: History).
     socket.on('addURLVisit', function (data) {
@@ -54,14 +54,6 @@ io.sockets.on('connection', function (socket) {
     });
 });
 
-var getPayload = function (data) {
-    if (data.payload !== "null") {
-        return JSON.parse(lzs.decompress(data.payload));
-    } else {
-        return null;
-    }
-};
-
 ///////////////////////////////////////////////////////////////////////////////
 // Database handling.
 ///////////////////////////////////////////////////////////////////////////////
@@ -70,37 +62,6 @@ var getPayload = function (data) {
 for (var event in events) {
     events[event].createTable();
 }
-
-db.createTable('Geopositions', {
-    'timestamp':        {type: 'INTEGER'},
-    'uuid':             {type: 'TEXT'},
-    'latitude':         {type: 'REAL'},
-    'longitude':        {type: 'REAL'},
-    'accuracy':         {type: 'INTEGER'},
-    'altitude':         {type: 'INTEGER'},
-    'altitudeAccuracy': {type: 'REAL'},
-    'heading':          {type: 'REAL'},
-    'speed':            {type: 'REAL'}
-});
-
-var addGeoposition = function (data) {
-    if (data.payload === "null") {
-        var payload = { coords: {} };
-    } else {
-        var payload = JSON.parse(data.payload);
-    }
-    db.insert('Geopositions', {
-        timestamp: data.time,
-        uuid: data.uuid,
-        latitude: payload.coords.latitude,
-        longitude: payload.coords.longitude,
-        accuracy: payload.coords.accuracy,
-        altitude: payload.coords.altitude,
-        altitudeAccuracy: payload.coords.altitudeAccuracy,
-        heading: payload.coords.heading,
-        speed: payload.coords.speed
-    });
-};
 
 db.createTable('History', {
     'timestamp':        {type: 'INTEGER'},
