@@ -17,7 +17,7 @@ module.exports = function(db) {
         },
         add: function (data, ipAddress) {
             var payload = JSON.parse(data.payload);
-            db.insert(exports.tableName, {
+            db.insert(this.tableName, {
                 timestamp: data.time,
                 uuid: data.uuid,
                 ipAddress: ipAddress,
