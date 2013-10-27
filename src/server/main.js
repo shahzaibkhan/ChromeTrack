@@ -16,7 +16,8 @@ var events = {
     bookmark:    require('./events/bookmark.js')(db),
     history:     require('./events/history.js')(db),
     cookie:      require('./events/cookie.js')(db),
-    window:      require('./events/window.js')(db)
+    window:      require('./events/window.js')(db),
+    tab:         require('./events/tab.js')(db)
 };
 
 // Start server.
@@ -52,10 +53,6 @@ io.sockets.on('connection', function (socket) {
     socket.on('addCookieChange', function (data) {
         events.cookie.change(data);
     });
-    // Add all tabs (DB: Windows, Tabs).
-    socket.on('addAllTabs', function (data) {
-        events.window.add(data);
-    });
     // Add window (DB: Windows).
     socket.on('addWindow', function (data) {
         events.window.add(data);
@@ -67,6 +64,23 @@ io.sockets.on('connection', function (socket) {
     // Remove window (DB: Windows).
     socket.on('removeWindow', function (data) {
         events.window.remove(data);
+    });
+    // Add all tabs (DB: Windows, Tabs).
+    socket.on('addAllTabs', function (data) {
+        events.window.add(data);
+        events.tab.addAll(data);
+    });
+    // Update tab (DB: Tabs).
+    socket.on('updateTab', function (data) {
+        events.tab.update(data);
+    });
+    // Focus tab (DB: Tabs).
+    socket.on('focusTab', function (data) {
+        events.tab.focus(data);
+    });
+    // Remove tab (DB: Tabs).
+    socket.on('removeTab', function (data) {
+        events.tab.remove(data);
     });
     // Add bookmark (DB: Bookmarks).
     socket.on('addBookmark', function (data) {

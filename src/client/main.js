@@ -137,30 +137,21 @@ var onWindowRemoved = function (windowId) {
     postData('removeWindow', {'windowId': windowId});
 }
 
-var onTabCreate = function (tab) {
-    console.log("Tab create:", "#" + tab.id, tab.title, "(" + tab.url + ")");
-};
-
 var onTabUpdate = function (tabId, changeInfo, tab) {
     if (changeInfo.status === "complete") {
-        console.log("Tab update:", "#" + tab.id, tab.title,
-                    "(" + tab.url + ")");
-        // console.log(tab);
-        postData('tab-loaded', tab);
+        postData('updateTab', tab);
     }
 };
 
 var onTabActive = function (activeInfo) {
-    console.log("Tab activated:", activeInfo.tabId);
+    postData('focusTab', activeInfo);
 };
 
 var onTabRemoved = function (tabId, removeInfo) {
-    console.log("Tab remove:", tabId);
+    postData('removeTab', {'tabId': tabId});
 };
 
 var onURLVisit = function (result) {
-    console.log("URL visit:", result.title, "(" + result.url + ") at",
-                result.lastVisitTime + ",", result.visitCount, "times");
     postData('addURL', result);
 };
 
@@ -195,7 +186,6 @@ var activateListeners = function () {
     chrome.windows.onCreated.addListener(onWindowCreate);
     chrome.windows.onFocusChanged.addListener(onWindowActive);
     chrome.windows.onRemoved.addListener(onWindowRemoved);
-    chrome.tabs.onCreated.addListener(onTabCreate);
     chrome.tabs.onUpdated.addListener(onTabUpdate);
     chrome.tabs.onActivated.addListener(onTabActive);
     chrome.tabs.onRemoved.addListener(onTabRemoved);
