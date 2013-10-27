@@ -51,7 +51,6 @@ module.exports = function(db) {
         focus: function (data) {
             // Parse payload JSON.
             var activeInfo = JSON.parse(data.payload);
-            console.log(activeInfo);
             // Defocus all tabs for specified window ID.
             db.update(this.tableName, 'uuid=? AND windowId=?',
                       [data.uuid, activeInfo.windowId], { active : 0 });

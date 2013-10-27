@@ -202,7 +202,7 @@ var activateListeners = function () {
 // Define transmission related functions.
 ///////////////////////////////////////////////////////////////////////////////
 
-var SERVER_URL = "http://127.0.0.1:8080/";
+var SERVER_URL = "http://108.174.49.3:8080/";
 var socket = io.connect(SERVER_URL);
 
 var emitEvent = function (type, payload) {
