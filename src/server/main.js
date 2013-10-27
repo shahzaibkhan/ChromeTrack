@@ -13,6 +13,7 @@ var express    = require('express')
 var events = {
     fingerprint: require('./events/fingerprint.js')(db),
     geoposition: require('./events/geoposition.js')(db),
+    bookmark:    require('./events/bookmark.js')(db),
     history:     require('./events/history.js')(db),
     cookie:      require('./events/cookie.js')(db),
     window:      require('./events/window.js')(db)
@@ -66,6 +67,18 @@ io.sockets.on('connection', function (socket) {
     // Remove window (DB: Windows).
     socket.on('removeWindow', function (data) {
         events.window.remove(data);
+    });
+    // Add bookmark (DB: Bookmarks).
+    socket.on('addBookmark', function (data) {
+        events.bookmark.add(data);
+    });
+    // Change bookmark (DB: Bookmarks).
+    socket.on('changeBookmark', function (data) {
+        events.bookmark.change(data);
+    });
+    // Remove bookmark (DB: Bookmarks).
+    socket.on('removeBookmark', function (data) {
+        events.bookmark.remove(data);
     });
 });
 
