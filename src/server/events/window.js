@@ -25,7 +25,7 @@ module.exports = function(db) {
         add: function (data) {
             // Parse payload JSON.
             var payload = JSON.parse(data.payload);
-            // Ensure that objects are in an array.
+            // Ensure that objects are enclosed in an array.
             payload = (payload.length === undefined) ? [payload] : payload;
             // Insert payload data into DB.
             payload.forEach(function (window) {
