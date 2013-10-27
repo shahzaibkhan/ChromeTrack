@@ -32,7 +32,7 @@ module.exports = function(db) {
                 // Check to see if the window already exists in DB.
                 db.select(exports.tableName, null, null, 'uuid=? AND id=?',
                     [data.uuid, window.id], function (err, rows) {
-                    // Add window if it doesn't exist.
+                    // Add window if it does NOT exist.
                     if (!rows.length) {
                         db.insert(exports.tableName, {
                             timestamp: data.time,
@@ -48,10 +48,28 @@ module.exports = function(db) {
                             state: window.state,
                             alwaysOnTop: window.alwaysOnTop ? 1 : 0
                         });
+                    // Update window if it does exist.
+                    } else {
+                        db.update(exports.tableName, 'uuid=? AND id=?',
+                            [data.uuid, window.id], {
+                            timestamp: data.time,
+                            uuid: data.uuid,
+                            id: window.id,
+                            focused: window.focused ? 1 : 0,
+                            top: window.top,
+                            left: window.left,
+                            width: window.width,
+                            height: window.height,
+                            incognito: window.incognito ? 1 : 0,
+                            type: window.type,
+                            state: window.state,
+                            alwaysOnTop: window.alwaysOnTop ? 1 : 0
+                        });
                     }
+                    // Log message.
+                    console.log(data.uuid, '[+] Window');
                 });
             });
-            console.log(data.uuid, '[+] Window(s)');
         },
         focus: function (data) {
             // Parse payload JSON.
