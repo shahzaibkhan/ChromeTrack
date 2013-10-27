@@ -22,7 +22,7 @@ module.exports = function(db) {
         add: function (data) {
             // Parse payload JSON.
             var payload = JSON.parse(data.payload);
-            // Ensure that objects are in an array.
+            // Ensure that objects are enclosed in an array.
             payload = (payload.length === undefined) ? [payload] : payload;
             // Insert payload data into DB.
             payload.forEach(function (historyItem) {
@@ -45,8 +45,8 @@ module.exports = function(db) {
             var payload = JSON.parse(data.payload);
             // Update payload data into DB.
             payload.urls.forEach(function (historyItem) {
-                db.update(this.tableName, 'url=?', [historyItem],
-                          { removed : 1 });
+                db.update(this.tableName, 'uuid? AND url=?',
+                          [data.uuid, historyItem], { removed : 1 });
             });
             console.log(data.uuid, '[+] URL Removal');
         }
