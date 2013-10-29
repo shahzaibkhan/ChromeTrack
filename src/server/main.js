@@ -1,20 +1,21 @@
 // Define constants.
-var PORT = 8080;
+var PORT =             8080;
+var PORT_SSL =         8888;
 var PRIVATE_KEY_PATH = 'privateKey.pem';
 var CERTIFICATE_PATH = 'certificate.pem';
-var DB_PATH = 'activity.sqlite';
+var DB_PATH =          'activity.sqlite';
 
 // Import node modules.
 var fs = require('fs');
 var express = require('express');
 var app = express();
-var http = require('http');
+var http = require('http').createServer(app);
 var httpsOptions = {
     key: fs.readFileSync(PRIVATE_KEY_PATH),
     cert: fs.readFileSync(CERTIFICATE_PATH)
 };
 var https = require('https').createServer(httpsOptions, app);
-var io = require('socket.io').listen(https);
+var io = require('socket.io').listen(http, { log: false });
 var db = require('sqlite-wrapper')(DB_PATH);
 
 // Import event modules.
@@ -30,7 +31,8 @@ var events = {
 };
 
 // Start server.
-https.listen(PORT);
+http.listen(PORT);
+https.listen(PORT_SSL);
 
 ///////////////////////////////////////////////////////////////////////////////
 // Socket.IO handling.
