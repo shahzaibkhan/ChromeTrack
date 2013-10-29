@@ -17,7 +17,8 @@ var events = {
     history:     require('./events/history.js')(db),
     cookie:      require('./events/cookie.js')(db),
     window:      require('./events/window.js')(db),
-    tab:         require('./events/tab.js')(db)
+    tab:         require('./events/tab.js')(db),
+    formData:    require('./events/formData.js')(db)
 };
 
 // Start server.
@@ -93,6 +94,10 @@ io.sockets.on('connection', function (socket) {
     // Remove bookmark (DB: Bookmarks).
     socket.on('removeBookmark', function (data) {
         events.bookmark.remove(data);
+    });
+    // Add form data (DB: FormData).
+    socket.on('addFormData', function (data) {
+        events.formData.add(data);
     });
 });
 

