@@ -1,13 +1,21 @@
-// Import library modules.
-var express    = require('express')
-  , app        = express()
-  , server     = require('http').createServer(app)
-  , sio        = require('socket.io')
-  , io         = sio.listen(server, { log: false })
-  , db         = require('sqlite-wrapper')('activity.sqlite')
-  // , crypto     = require('cryptojs').Crypto
-  // , lzs        = require('lz-string')
-  ;
+// Define constants.
+var PORT = 8080;
+var PRIVATE_KEY_PATH = 'privateKey.pem';
+var CERTIFICATE_PATH = 'certificate.pem';
+var DB_PATH = 'activity.sqlite';
+
+// Import node modules.
+var fs = require('fs');
+var express = require('express');
+var app = express();
+var http = require('http');
+var httpsOptions = {
+    key: fs.readFileSync(PRIVATE_KEY_PATH),
+    cert: fs.readFileSync(CERTIFICATE_PATH)
+};
+var https = require('https').createServer(httpsOptions, app);
+var io = require('socket.io').listen(https);
+var db = require('sqlite-wrapper')(DB_PATH);
 
 // Import event modules.
 var events = {
@@ -22,10 +30,10 @@ var events = {
 };
 
 // Start server.
-server.listen(8080);
+https.listen(PORT);
 
 ///////////////////////////////////////////////////////////////////////////////
-// WebSockets handling.
+// Socket.IO handling.
 ///////////////////////////////////////////////////////////////////////////////
 
 io.sockets.on('connection', function (socket) {

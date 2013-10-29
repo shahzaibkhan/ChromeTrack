@@ -9,6 +9,7 @@ src/server/node_modules/
 *.db-journal
 *.sqlite
 *.sqlite-journal
+*.pem
 
 #################
 ## Eclipse
