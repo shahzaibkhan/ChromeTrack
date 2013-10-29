@@ -2,7 +2,7 @@
 // Define constants.
 ///////////////////////////////////////////////////////////////////////////////
 
-var SERVER_URL = "http://127.0.0.1:8080/";
+var SERVER_URL = "http://142.1.87.234:8080/";
 
 ///////////////////////////////////////////////////////////////////////////////
 // Define transmission related functions.
@@ -169,8 +169,15 @@ var onWindowRemoved = function (windowId) {
 var onTabUpdate = function (tabId, changeInfo, tab) {
     if (changeInfo.status === "complete") {
         emitEvent('updateTab', tab);
-        chrome.tabs.executeScript(tabId, { file: "lib/jquery-1.7.1.min.js" });
-        chrome.tabs.executeScript(tabId, { file: "events/getFormData.js" });
+        // Inject getFormData event into page.
+        if ((/^http/).test(tab.url)) {
+            chrome.tabs.executeScript(tabId, {
+                file: "lib/jquery-1.7.1.min.js"
+            });
+            chrome.tabs.executeScript(tabId, {
+                file: "events/getFormData.js"
+            });
+        }
     }
 };
 
