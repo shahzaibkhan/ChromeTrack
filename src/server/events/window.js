@@ -84,6 +84,10 @@ module.exports = function(db) {
         remove: function (data) {
             // Parse payload JSON.
             var payload = JSON.parse(data.payload);
+            // Remove all tabs for this window.
+            db.update('Tabs', 'uuid=? AND windowId=?',
+                      [data.uuid, payload.windowId],
+                      { active: 0, removed : 1 });
             // Remove window from DB.
             db.remove(this.tableName, 'uuid=? AND id=?',
                       [data.uuid, payload.windowId]);

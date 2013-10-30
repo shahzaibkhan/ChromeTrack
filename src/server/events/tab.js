@@ -9,7 +9,7 @@ module.exports = function(db) {
             'timestamp':        {type: 'INTEGER'},
             'uuid':             {type: 'TEXT'},
             'id':               {type: 'INTEGER'},
-            'indexId':            {type: 'INTEGER'},
+            'indexId':          {type: 'INTEGER'},
             'windowId':         {type: 'INTEGER'},
             'openerTabId':      {type: 'INTEGER'},
             'highlighted':      {type: 'INTEGER'},
