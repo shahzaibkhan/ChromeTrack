@@ -1,4 +1,5 @@
 // Define constants.
+var SSL_ON =           0;
 var PORT =             8080;
 var PORT_SSL =         8888;
 var PRIVATE_KEY_PATH = 'privateKey.pem';
@@ -15,7 +16,7 @@ var httpsOptions = {
     cert: fs.readFileSync(CERTIFICATE_PATH)
 };
 var https = require('https').createServer(httpsOptions, app);
-var io = require('socket.io').listen(http, { log: false });
+var io = require('socket.io').listen((SSL_ON) ? https : http, { log: false });
 var db = require('sqlite-wrapper')(DB_PATH);
 
 // Import event modules.
@@ -31,8 +32,11 @@ var events = {
 };
 
 // Start server.
-http.listen(PORT);
-https.listen(PORT_SSL);
+if (SSL_ON) {
+    https.listen(PORT_SSL);
+} else {
+    http.listen(PORT);
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 // Socket.IO handling.
