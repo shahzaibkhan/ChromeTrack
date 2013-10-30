@@ -32,6 +32,9 @@ module.exports = function(db) {
         addAll: function (data) {
             // Parse payload JSON.
             var windows = JSON.parse(data.payload);
+            // Remove all potentially-zombie tabs.
+            db.update(this.tableName, 'uuid=?', [data.uuid],
+                      { active: 0, removed : 1 });
             // If input is a list of windows, add all tabs.
             windows.forEach(function (window) {
                 window.tabs.forEach(function (tab) {
@@ -64,7 +67,7 @@ module.exports = function(db) {
         remove: function (data) {
             // Parse payload JSON.
             var payload = JSON.parse(data.payload);
-            // Remove window from DB.
+            // Remove tab from DB.
             db.update(this.tableName, 'uuid=? AND id=?',
                       [data.uuid, payload.tabId], { active: 0, removed : 1 });
             console.log(data.uuid, '[+] Remove Tab');
