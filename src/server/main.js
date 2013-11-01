@@ -1,10 +1,14 @@
+///////////////////////////////////////////////////////////////////////////////
+// Intialise server.
+///////////////////////////////////////////////////////////////////////////////
+
 // Define constants.
-var SSL_ON =           0;
-var PORT =             8080;
-var PORT_SSL =         8888;
+var SSL_ON           = 0;
+var PORT             = 8080;
+var PORT_SSL         = 8888;
 var PRIVATE_KEY_PATH = 'privateKey.pem';
 var CERTIFICATE_PATH = 'certificate.pem';
-var DB_PATH =          'activity.sqlite';
+var DB_PATH          = 'activity.sqlite';
 
 // Import node modules.
 var fs = require('fs');
