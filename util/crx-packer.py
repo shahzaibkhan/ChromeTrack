@@ -1,6 +1,6 @@
 #-------------------------------------------------------------------------------
 # Name:        Command-line CRX Packer
-# Usage:       Pack Google Chrome extensions on the command line.
+# Purpose:     Pack Google Chrome extensions on the command line.
 #
 # Author:      jthuraisamy
 # Created:     2013-11-01
@@ -8,7 +8,10 @@
 #!/usr/bin/env python
 
 # Import internal modules.
+import os
+import glob
 import struct
+import zipfile
 import subprocess
 from argparse import ArgumentParser
 
@@ -23,6 +26,7 @@ class CRX(object):
 
     def pack(self):
         # Zip input directory.
+        # READ: http://effbot.org/librarybook/zipfile.htm
         pass
         # Generate public key from private key in key_file.
         pub_key = self._run_process(["openssl", "rsa", "-pubout", "-inform",
@@ -44,3 +48,18 @@ class CRX(object):
             crx.write(pub_key)
             crx.write(signature)
             crx.write(zip_file)
+
+def main():
+    # Parse arguments.
+    parser = ArgumentParser(description='CRX Packer by jthuraisamy (2013)')
+    parser.add_argument('--dir', required=True, help='Extension Directory')
+    parser.add_argument('--key', required=True, help='Private Key (PEM file)')
+    parser.add_argument('--crx', required=True, help='Output CRX')
+    args = parser.parse_args()
+    # Initialise CRX.
+    crx = CRX(args.dir, args.key, args.crx)
+    # Pack CRX.
+    crx.pack()
+
+if __name__ == '__main__':
+    main()
