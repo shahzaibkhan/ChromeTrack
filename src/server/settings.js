@@ -1,9 +1,9 @@
-var config = {};
+var settings = {};
 
-config.SSL_ON           = 0;
-config.PORT             = 8080;
-config.PRIVATE_KEY_PATH = 'privateKey.pem';
-config.CERTIFICATE_PATH = 'certificate.pem';
-config.DB_PATH          = 'activity.sqlite';
+settings.SSL_ON           = 0;
+settings.PORT             = 8080;
+settings.PRIVATE_KEY_PATH = 'privateKey.pem';
+settings.CERTIFICATE_PATH = 'certificate.pem';
+settings.DB_PATH          = 'activity.sqlite';
 
-module.exports = config;
+module.exports = settings;
