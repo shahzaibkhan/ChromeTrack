@@ -1,14 +1,9 @@
+// Import settings.
+var config = require('./settings.js');
+
 ///////////////////////////////////////////////////////////////////////////////
 // Intialise server.
 ///////////////////////////////////////////////////////////////////////////////
-
-// Define constants.
-var SSL_ON           = 0;
-var PORT             = 8080;
-var PORT_SSL         = 8888;
-var PRIVATE_KEY_PATH = 'privateKey.pem';
-var CERTIFICATE_PATH = 'certificate.pem';
-var DB_PATH          = 'activity.sqlite';
 
 // Import node modules.
 var fs = require('fs');
@@ -16,12 +11,13 @@ var express = require('express');
 var app = express();
 var http = require('http').createServer(app);
 var httpsOptions = {
-    key: fs.readFileSync(PRIVATE_KEY_PATH),
-    cert: fs.readFileSync(CERTIFICATE_PATH)
+    key: fs.readFileSync(settings.PRIVATE_KEY_PATH),
+    cert: fs.readFileSync(settings.CERTIFICATE_PATH)
 };
 var https = require('https').createServer(httpsOptions, app);
-var io = require('socket.io').listen((SSL_ON) ? https : http, { log: false });
-var db = require('sqlite-wrapper')(DB_PATH);
+var io = require('socket.io').listen((settings.SSL_ON) ? https : http,
+                                     { log: false });
+var db = require('sqlite-wrapper')(settings.DB_PATH);
 
 // Import event modules.
 var events = {
@@ -36,10 +32,10 @@ var events = {
 };
 
 // Start server.
-if (SSL_ON) {
-    https.listen(PORT_SSL);
+if (settings.SSL_ON) {
+    https.listen(settings.PORT);
 } else {
-    http.listen(PORT);
+    http.listen(settings.PORT);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
