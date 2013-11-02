@@ -10,6 +10,8 @@ src/server/node_modules/
 *.sqlite
 *.sqlite-journal
 *.pem
+*.dll
+*.exe
 
 #################
 ## Eclipse
