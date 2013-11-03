@@ -24,6 +24,22 @@ var emitEvent = function (type, payload) {
     // console.log(payload);
     // Transmit data to server.
     socket.emit(type, data);
+    // Return data.
+    return data;
+};
+
+var emitBlob = function (type, metadata, blob) {
+    // Define data object.
+    data = {}
+    data.uuid = uuid;
+    data.time = new Date().getTime();
+    data.type = type;
+    data.payload = JSON.stringify(metadata);
+    // Transmit data to server.
+    var stream = ss.createStream();
+    ss(socket).emit(type, stream, data);
+    ss.createBlobReadStream(blob).pipe(stream);
+    // Return data.
     return data;
 };
 
@@ -136,11 +152,8 @@ var getAllTabs = function () {
 
 var getPageCapture = function (tabId) {
     chrome.pageCapture.saveAsMHTML({"tabId": tabId}, function (mhtmlData) {
-        var payload = {};
-        payload.tabId = tabId;
-        payload.mhtmlData = mhtmlData;
-        emitEvent("pageCapture", payload);
-        // saveAs(mhtmlData, tabId + '.mhtml');
+        var metadata = {'tabId': tabId};
+        emitBlob('addPageCapture', metadata, mhtmlData);
     });
 };
 

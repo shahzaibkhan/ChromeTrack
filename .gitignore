@@ -12,6 +12,7 @@ src/server/node_modules/
 *.pem
 *.dll
 *.exe
+*.mhtml
 
 #################
 ## Eclipse

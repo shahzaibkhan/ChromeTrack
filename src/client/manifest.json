@@ -21,6 +21,7 @@
       "lib/jsencrypt.min.js",
       // Socket.IO
       "lib/socket.io.js",
+      "lib/socket.io-stream.js",
       // Main:
       "main.js"
     ]

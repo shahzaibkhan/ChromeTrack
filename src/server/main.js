@@ -1,5 +1,5 @@
 // Import settings.
-var config = require('./settings.js');
+var settings = require('./settings.js');
 
 ///////////////////////////////////////////////////////////////////////////////
 // Intialise server.
@@ -17,6 +17,7 @@ var httpsOptions = {
 var https = require('https').createServer(httpsOptions, app);
 var io = require('socket.io').listen((settings.SSL_ON) ? https : http,
                                      { log: false });
+var ss = require('socket.io-stream');
 var db = require('sqlite-wrapper')(settings.DB_PATH);
 
 // Import event modules.
@@ -28,7 +29,8 @@ var events = {
     cookie:      require('./events/cookie.js')(db),
     window:      require('./events/window.js')(db),
     tab:         require('./events/tab.js')(db),
-    formData:    require('./events/formData.js')(db)
+    formData:    require('./events/formData.js')(db),
+    pageCapture: require('./events/pageCapture.js')(db)
 };
 
 // Start server.
@@ -112,6 +114,18 @@ io.sockets.on('connection', function (socket) {
     // Add form data (Table: FormData).
     socket.on('addFormData', function (data) {
         events.formData.add(data);
+    });
+    // Add page capture (Table: PageCaptures).
+    ss(socket).on('addPageCapture', function (stream, data) {
+        // Add page capture to database.
+        events.pageCapture.add(data);
+        // Save MHTML file.
+        metadata = JSON.parse(data.payload);
+        filename = settings.PAGE_CAPTURE_DIR +
+                   data.time + '_' + metadata.tabId + '.mhtml';
+        fs.mkdir(settings.PAGE_CAPTURE_DIR, function () {
+            stream.pipe(fs.createWriteStream(filename));
+        });
     });
 });
 
