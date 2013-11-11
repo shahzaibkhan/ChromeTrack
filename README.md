@@ -1,7 +1,10 @@
 ChromeTrack
 ===========
 
-**This is a Google Chrome extension to transmit browser activity and a node.js server to log such activity.**
+This is:
+
+1. a _Google Chrome extension_ to **transmit browser activity** and
+2. a _node.js_ server to **log browser activity**.
 
 After [news](http://blog.chromium.org/2013/11/protecting-windows-users-from-malicious.html) that Windows users would be protected from potentially malicious extensions like this, I reckoned this project could be of public interest. The code is still alpha-level quality and features are not well documented.
 
