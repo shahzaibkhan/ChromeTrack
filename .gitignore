@@ -5,6 +5,7 @@
 bin/
 doc/
 src/server/node_modules/
+util/client/
 *.db
 *.db-journal
 *.sqlite
