@@ -30,7 +30,7 @@ In realtime:
 * bookmarks (add/remove)
 * url visits (add/remove)
 * tabs (add/remove)
-* page captures as mhtml
+* page captures as MHTML files
 * cookies
 
 Installation
@@ -41,4 +41,4 @@ Installation
 3. Visit `chrome://extensions`.
 4. Enable 'Developer mode'.
 5. Click 'Load unpacked extension'.
-6. Select src/client folder from this repo.
+6. Select `src/client/` folder from this repo.
