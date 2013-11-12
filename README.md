@@ -28,3 +28,13 @@ In realtime:
 * tabs (add/remove)
 * page captures as mhtml
 * cookies
+
+Installation
+------------
+
+1. Clone this repository.
+2. Open Google Chrome.
+3. Visit chrome://extensions.
+4. Enable 'Developer mode'.
+5. Click 'Load unpacked extension'.
+6. Select src/client folder from this repo.
