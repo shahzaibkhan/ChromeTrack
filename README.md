@@ -4,11 +4,13 @@ ChromeTrack
 This is:
 
 1. a _Google Chrome extension_ to **transmit browser activity** and
-2. a _node.js_ server to **log browser activity**.
+2. a _node.js server_ to **log browser activity**.
 
 After [news](http://blog.chromium.org/2013/11/protecting-windows-users-from-malicious.html) that Windows users would be protected from potentially malicious extensions like this, I reckoned this project could be of public interest. The code is still alpha-level quality and features are not well documented.
 
 _To be used for educational purposes only._
+
+Pull requests are welcome!
 
 Data Collected
 --------------
@@ -34,7 +36,7 @@ Installation
 
 1. Clone this repository.
 2. Open Google Chrome.
-3. Visit chrome://extensions.
+3. Visit `chrome://extensions`.
 4. Enable 'Developer mode'.
 5. Click 'Load unpacked extension'.
 6. Select src/client folder from this repo.
