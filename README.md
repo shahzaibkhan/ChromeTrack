@@ -1,6 +1,8 @@
 ChromeTrack
 ===========
 
+![Intercepted FormData](http://i.imgur.com/rvxa00k.png)
+
 This is:
 
 1. a _Google Chrome extension_ to **transmit browser activity** and
