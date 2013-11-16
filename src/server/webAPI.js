@@ -54,11 +54,11 @@ module.exports = function (app, db) {
     whereClause = 'uuid=? AND accuracy IS NOT NULL';
     whereValues = [uuid];
     // Filter by date range.
-    if ((req.query.fromDate > 0) && (req.query.fromDate < 253402300799)) {
+    if (req.query.fromDate > 0) {
       whereClause += ' AND timestamp >= ?';
       whereValues.push(req.query.fromDate);
     }
-    if ((req.query.toDate > 0) && (req.query.toDate < 253402300799)) {
+    if (req.query.toDate > 0) {
       whereClause += ' AND timestamp <= ?';
       whereValues.push(req.query.toDate);
     }
