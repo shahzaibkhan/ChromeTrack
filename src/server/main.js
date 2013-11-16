@@ -19,6 +19,7 @@ var io = require('socket.io').listen((settings.SSL_ON) ? https : http,
                                      { log: false });
 var ss = require('socket.io-stream');
 var db = require('sqlite-wrapper')(settings.DB_PATH);
+var webAPI = require('./webAPI.js')(app, db);
 
 // Import event modules.
 var events = {
