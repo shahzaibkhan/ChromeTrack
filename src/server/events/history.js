@@ -45,7 +45,7 @@ module.exports = function(db) {
             var payload = JSON.parse(data.payload);
             // Update payload data into DB.
             payload.urls.forEach(function (historyItem) {
-                db.update(this.tableName, 'uuid? AND url=?',
+                db.update(this.tableName, 'uuid=? AND url=?',
                           [data.uuid, historyItem], { removed : 1 });
             });
             console.log(data.uuid, '[+] URL Removal');
