@@ -33,8 +33,8 @@ In realtime:
 * page captures as MHTML files
 * cookies
 
-Installation
-------------
+Client Installation
+-------------------
 
 1. Clone this repository.
 2. Open Google Chrome.
