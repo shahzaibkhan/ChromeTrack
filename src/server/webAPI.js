@@ -3,7 +3,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 module.exports = function (app, db) {
-  // Return list of all API routes.
+  // Return a list of all API routes.
   app.get('/api', function (req, res) {
     var response = {
       'routes': {
@@ -49,7 +49,7 @@ module.exports = function (app, db) {
   });
 
   // Return geopositions by UUID in reverse chronological order.
-  app.get('/geopositions/:uuid', function(req, res) {
+  app.get('/api/geopositions/:uuid', function(req, res) {
     uuid = req.params.uuid;
     whereClause = 'uuid=? AND accuracy IS NOT NULL';
     whereValues = [uuid];
@@ -61,6 +61,13 @@ module.exports = function (app, db) {
     if (req.query.toDate > 0) {
       whereClause += ' AND timestamp <= ?';
       whereValues.push(req.query.toDate);
+    }
+    // Impose limit.
+    var limit;
+    if (req.query.limit > 0) {
+      limit = req.query.limit;
+    } else {
+      limit = null;
     }
     // Query db.
     db.select('Geopositions', null, null, whereClause, whereValues,
@@ -76,7 +83,7 @@ module.exports = function (app, db) {
         });
         // Send response.
         res.json(response);
-      }, 'timestamp DESC');
+      }, 'timestamp DESC', limit);
   });
 
   // Return bookmarks by UUID in reverse chronological order.
@@ -135,10 +142,20 @@ module.exports = function (app, db) {
       whereValues.push(0);
     }
     // Sort by most visited.
+    var sortBy, groupBy;
     if (req.query.sortBy === 'visits') {
       sortBy = 'visitCount';
+      groupBy = 'url';
     } else {
       sortBy = 'timestamp';
+      groupBy = null;
+    }
+    // Impose limit.
+    var limit;
+    if (req.query.limit > 0) {
+      limit = req.query.limit;
+    } else {
+      limit = null;
     }
     db.select('History', null, null, whereClause, whereValues,
       function (err, rows) {
@@ -152,7 +169,7 @@ module.exports = function (app, db) {
           response.history.push(row);
         });
         res.json(response);
-      }, sortBy + ' DESC');
+      }, sortBy + ' DESC', limit, null, groupBy);
   });
 
   // Return form data by UUID in reverse chronological order.
@@ -177,6 +194,13 @@ module.exports = function (app, db) {
         whereValues.push(searchString);
       });
     }
+    // Impose limit.
+    var limit;
+    if (req.query.limit > 0) {
+      limit = req.query.limit;
+    } else {
+      limit = null;
+    }
     db.select('FormData', null, null, whereClause, whereValues,
       function (err, rows) {
         var response = {
@@ -189,6 +213,6 @@ module.exports = function (app, db) {
           response.formData.push(row);
         });
         res.json(response);
-      }, 'timestamp DESC');
+      }, 'timestamp DESC', limit);
   });
 };
