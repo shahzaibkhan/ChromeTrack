@@ -42,3 +42,8 @@ Client Installation
 4. Enable 'Developer mode'.
 5. Click 'Load unpacked extension'.
 6. Select `src/client/` folder from this repo.
+
+Licence
+-------
+
+[MIT](http://www.tldrlegal.com/l/MIT)
