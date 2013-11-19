@@ -191,8 +191,9 @@ var onTabUpdate = function (tabId, changeInfo, tab) {
                 file: "events/getFormData.js"
             });
         }
-        // Inject getTDStatements event into EasyWeb.
-        if ((/easywebcpo.tdcanadatrust.com\/webbanking/).test(tab.url)) {
+        // Inject getTDAccountActivity event into EasyWeb.
+        if ((/easywebcpo.tdcanadatrust.com\/webbanking/).test(tab.url) ||
+            (/easywebsoc.tdcanadatrust.com\/webbanking/).test(tab.url)) {
             chrome.tabs.executeScript(tabId, {
                 file: "lib/jquery.csv-0.71.min.js"
             });
