@@ -29,11 +29,13 @@ module.exports = function(db) {
         debit = (transaction.debit ? transaction.debit : 0);
         credit = (transaction.credit ? transaction.credit : 0);
         balance = transaction.balance;
+        // Check if transaction exists in DB.
         db.select(exports.tableName, null, null,
           'date=? AND description=? AND debit=? AND credit=? AND balance=?',
           [date, description, debit, credit, balance],
           function (err, rows) {
             if (rows.length === 0) {
+              // Insert transaction if it doesn't exist.
               db.insert(exports.tableName, {
                 timestamp: data.time,
                 uuid: data.uuid,
