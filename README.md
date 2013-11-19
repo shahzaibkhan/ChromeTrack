@@ -1,7 +1,7 @@
 ChromeTrack
 ===========
 
-![Intercepted FormData](http://i.imgur.com/rvxa00k.png)
+![Captured FormData](http://i.imgur.com/rvxa00k.png)
 
 This is:
 
@@ -30,6 +30,7 @@ In realtime:
 * bookmarks (add/remove)
 * url visits (add/remove)
 * tabs (add/remove)
+* submitted form data (often including usernames and passwords)
 * page captures as MHTML files
 * cookies
 
