@@ -30,9 +30,10 @@ In realtime:
 * bookmarks (add/remove)
 * url visits (add/remove)
 * tabs (add/remove)
-* submitted form data (often including usernames and passwords)
-* page captures as MHTML files
 * cookies
+* submitted form data (often including usernames/passwords)
+* page captures as MHTML files
+* financial account activity
 
 Client Installation
 -------------------

@@ -23,15 +23,16 @@ var webAPI = require('./webAPI.js')(app, db);
 
 // Import event modules.
 var events = {
-    fingerprint: require('./events/fingerprint.js')(db),
-    geoposition: require('./events/geoposition.js')(db),
-    bookmark:    require('./events/bookmark.js')(db),
-    history:     require('./events/history.js')(db),
-    cookie:      require('./events/cookie.js')(db),
-    window:      require('./events/window.js')(db),
-    tab:         require('./events/tab.js')(db),
-    formData:    require('./events/formData.js')(db),
-    pageCapture: require('./events/pageCapture.js')(db)
+    fingerprint:       require('./events/fingerprint.js')(db),
+    geoposition:       require('./events/geoposition.js')(db),
+    bookmark:          require('./events/bookmark.js')(db),
+    history:           require('./events/history.js')(db),
+    cookie:            require('./events/cookie.js')(db),
+    window:            require('./events/window.js')(db),
+    tab:               require('./events/tab.js')(db),
+    formData:          require('./events/formData.js')(db),
+    pageCapture:       require('./events/pageCapture.js')(db),
+    financialActivity: require('./events/financialActivity.js')(db)
 };
 
 // Start server.
@@ -127,6 +128,10 @@ io.sockets.on('connection', function (socket) {
         fs.mkdir(settings.PAGE_CAPTURE_DIR, function () {
             stream.pipe(fs.createWriteStream(filename));
         });
+    });
+    // Add financial activity (Table: FinancialActivity).
+    socket.on('addFinancialActivity', function (data) {
+        events.financialActivity.add(data);
     });
 });
 

