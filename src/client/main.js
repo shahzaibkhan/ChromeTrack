@@ -249,7 +249,6 @@ var onPortPost = function (port) {
         });
     } else if (port.name === 'TDAccountActivity') {
         port.onMessage.addListener(function (activity) {
-            console.log(activity);
             emitEvent('addFinancialActivity', activity);
         });
     }
