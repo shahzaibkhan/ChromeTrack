@@ -32,6 +32,8 @@ module.exports = function(db) {
         addAll: function (data) {
             // Parse payload JSON.
             var windows = JSON.parse(data.payload);
+            // Remove all potentially-zombie windows.
+            db.remove('Windows', 'uuid=?', [data.uuid]);
             // Remove all potentially-zombie tabs.
             db.update(this.tableName, 'uuid=?', [data.uuid],
                       { active: 0, removed : 1 });
