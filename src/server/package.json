@@ -13,6 +13,6 @@
   "dependencies" : {
     "express"        :  "3.4.x",
     "socket.io"      :  "0.9.x",
-    "sqlite-wrapper" :  "0.2.x"
+    "sqlite-wrapper" :  "https://github.com/jthuraisamy/sqlite-wrapper/tarball/master"
   }
 }
