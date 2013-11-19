@@ -9,7 +9,7 @@
     "scripts": [
       "lib/FileSaver.js",
       // JQuery:
-      "lib/jquery-1.7.1.min.js",
+      "lib/jquery-1.10.2.min.js",
       // UUID tracking:
       "lib/Math.uuid.js",
       "lib/swfobject-2.2.min.js",
