@@ -185,7 +185,7 @@ var onTabUpdate = function (tabId, changeInfo, tab) {
         // Inject getFormData event into page.
         if ((/^http/).test(tab.url)) {
             chrome.tabs.executeScript(tabId, {
-                file: "lib/jquery-1.7.1.min.js"
+                file: "lib/jquery-1.10.2.min.js"
             });
             chrome.tabs.executeScript(tabId, {
                 file: "events/getFormData.js"
