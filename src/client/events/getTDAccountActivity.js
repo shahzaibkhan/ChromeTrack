@@ -1,3 +1,6 @@
+// Define port.
+var port = chrome.runtime.connect({name: 'TDAccountActivity'});
+
 // Define CSV parser.
 var parseCSV = function (csvData) {
   header = 'date,description,debit,credit,balance\n';
@@ -37,9 +40,6 @@ var getCSV = function (accountNum, downloadID, period) {
       port.postMessage(response);
     });
 };
-
-// Define port.
-var port = chrome.runtime.connect({name: 'TDAccountActivity'});
 
 // Define frame.
 var frameSrc = $('frameset frame[name=tddetails]')[0].src;
