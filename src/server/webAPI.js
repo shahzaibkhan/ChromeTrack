@@ -215,4 +215,48 @@ module.exports = function (app, db) {
         res.json(response);
       }, 'timestamp DESC', limit);
   });
+
+  // Return financial activity by UUID in reverse chronological order.
+  app.get('/api/financials/:uuid', function(req, res) {
+    uuid = req.params.uuid;
+    whereClause = 'uuid=?';
+    whereValues = [uuid];
+    // Filter by date range.
+    if (req.query.fromDate > 0) {
+      whereClause += ' AND timestamp >= ?';
+      whereValues.push(req.query.fromDate);
+    }
+    if (req.query.toDate > 0) {
+      whereClause += ' AND timestamp <= ?';
+      whereValues.push(req.query.toDate);
+    }
+    // Filter by keywords in url and data columns.
+    if (req.query.contains) {
+      searchStrings = req.query.contains.split(' ');
+      searchStrings.forEach(function (searchString) {
+        whereClause += " AND (description) LIKE '%' || ? || '%'";
+        whereValues.push(searchString);
+      });
+    }
+    // Impose limit.
+    var limit;
+    if (req.query.limit > 0) {
+      limit = req.query.limit;
+    } else {
+      limit = null;
+    }
+    db.select('FinancialActivity', null, null, whereClause, whereValues,
+      function (err, rows) {
+        var response = {
+          'uuid': uuid,
+          'total': rows.length,
+          'financialActivity': []
+        };
+        rows.forEach(function (row) {
+          delete row.uuid;
+          response.financialActivity.push(row);
+        });
+        res.json(response);
+      }, 'timestamp DESC', limit);
+  });
 };
